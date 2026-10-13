@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Diego Ramirez Laverde — Portfolio</title>
   <meta name="description" content="Interactive portfolio of Diego Ramirez Laverde." />
+  <meta name="theme-color" content="#030108" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/styles.css" />
   <script>
     // Apply the saved theme before first paint to avoid a flash.
@@ -16,59 +17,88 @@
 </head>
 <body>
   <canvas id="bg" aria-hidden="true"></canvas>
+  <div class="grid-bg" aria-hidden="true"></div>
   <div class="cursor" aria-hidden="true"></div>
 
-  <header class="nav">
-    <a class="logo" href="#top" data-name></a>
-    <nav>
+  <header class="nav" id="nav">
+    <a class="logo mono" href="#top"><span class="logo-mark">✓</span><span data-handle></span></a>
+    <nav class="nav-links" id="nav-links">
       <a href="#projects">Projects</a>
       <a href="#about">About</a>
       <a href="#terminal">Terminal</a>
       <a href="#contact">Contact</a>
     </nav>
     <div class="nav-actions">
-      <button class="kbd-btn" id="open-palette" title="Command palette">
+      <button class="kbd-btn" id="open-palette" title="Command palette (Ctrl/⌘ + K)">
         <span>Search</span> <kbd>⌘K</kbd>
       </button>
       <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme">◐</button>
+      <a class="nav-cta" id="nav-github" target="_blank" rel="noopener">View GitHub</a>
+      <button class="icon-btn hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">☰</button>
     </div>
+    <div class="scroll-progress" id="scroll-progress"></div>
   </header>
 
   <main id="top">
-    <section class="hero">
-      <p class="eyebrow mono">hello, world — I'm</p>
-      <h1 class="hero-name" data-name></h1>
-      <p class="hero-role" data-role></p>
-      <p class="hero-type mono"><span id="typewriter"></span><span class="caret">▍</span></p>
-      <div class="hero-cta">
-        <a class="btn primary magnetic" href="#projects">See my work</a>
-        <a class="btn magnetic" href="#terminal">Open terminal</a>
+    <section class="hero" id="studio">
+      <div class="hero-text">
+        <div class="eyebrow mono reveal"><span class="logo-mark sm">✓</span><span data-name></span><span class="rule"></span></div>
+        <h1 class="hero-title reveal">
+          <span class="rotating"><span id="rotating-word"></span><span class="caret"></span></span>
+          <span id="headline"></span>
+        </h1>
+        <p class="lead reveal" id="intro"></p>
+        <div class="hero-cta reveal">
+          <a class="btn primary magnetic" href="#projects">See my work <span aria-hidden="true">↓</span></a>
+          <a class="btn magnetic" id="hero-github" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            GitHub
+          </a>
+        </div>
+        <p class="hint mono reveal">tip: hover anything that glows · click the lamp · <kbd>⌘K</kbd></p>
       </div>
-      <p class="hint mono">tip: move your mouse, press <kbd>⌘K</kbd>, or type <code>help</code> in the terminal</p>
+      <div class="room-wrap reveal">
+        <svg id="room" viewBox="0 0 636 620" role="group" aria-label="Interactive urban planning studio. Each glowing object is a project."></svg>
+        <div class="room-label mono" id="room-label" aria-hidden="true"></div>
+      </div>
+      <div class="room-chips mono" id="room-chips" aria-label="Projects in the room"></div>
+    </section>
+
+    <section class="section glance">
+      <div class="label mono reveal">At a glance<span class="rule"></span></div>
+      <div class="stats reveal" id="stats"></div>
+      <div class="check-card reveal" id="check-card">
+        <div class="check-head mono">
+          <span><span class="logo-mark sm">✓</span> plan review passed</span>
+          <span class="dim" id="check-count"></span>
+        </div>
+        <ul class="check-list mono" id="check-list"></ul>
+      </div>
+      <p class="check-cmd mono">$ <span data-handle></span> review ./projects --people-first</p>
     </section>
 
     <section id="projects" class="section">
+      <div class="label mono reveal">Selected work<span class="rule"></span></div>
       <div class="section-head reveal">
-        <h2><span class="mono num">01.</span> Projects</h2>
+        <h2>Plans &amp; projects.</h2>
         <div class="filters" id="filters" role="tablist"></div>
       </div>
       <div class="grid" id="project-grid"></div>
     </section>
 
-    <section id="about" class="section about">
-      <div class="section-head reveal">
-        <h2><span class="mono num">02.</span> About</h2>
-      </div>
-      <div class="about-body reveal">
+    <section id="about" class="section">
+      <div class="label mono reveal">About<span class="rule"></span></div>
+      <h2 class="reveal">A bit about me.</h2>
+      <div class="panel reveal">
         <p id="about-text"></p>
         <ul class="skills" id="skills"></ul>
       </div>
     </section>
 
     <section id="terminal" class="section">
-      <div class="section-head reveal">
-        <h2><span class="mono num">03.</span> Terminal</h2>
-      </div>
+      <div class="label mono reveal">Interactive<span class="rule"></span></div>
+      <h2 class="reveal">Explore from the terminal.</h2>
+      <p class="sub reveal">Type <code>help</code> to get started. Tab completes, ↑/↓ steps through history.</p>
       <div class="term reveal" id="term">
         <div class="term-bar">
           <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
@@ -83,26 +113,23 @@
     </section>
 
     <section id="contact" class="section contact">
-      <div class="reveal">
-        <h2><span class="mono num">04.</span> Let's build something</h2>
-        <p>My inbox is always open — whether it's a project, a role, or just to say hi.</p>
-        <div class="contact-links" id="contact-links"></div>
-      </div>
+      <div class="label mono reveal center">Contact<span class="rule"></span></div>
+      <h2 class="reveal">Let's build something.</h2>
+      <p class="sub reveal">My inbox is always open, whether it's about a project, a role, or just saying hi.</p>
+      <div class="contact-links reveal" id="contact-links"></div>
     </section>
   </main>
 
   <footer class="footer mono">
     <span>© <span id="year"></span> <span data-name></span></span>
-    <span>built from scratch · no frameworks</span>
+    <span>hand-drawn in SVG · no frameworks</span>
   </footer>
 
-  <!-- Project modal -->
   <dialog id="modal" class="modal">
     <button class="icon-btn modal-close" id="modal-close" aria-label="Close">✕</button>
     <div id="modal-content"></div>
   </dialog>
 
-  <!-- Command palette -->
   <dialog id="palette" class="palette">
     <input id="palette-in" placeholder="Type a command or search projects…" autocomplete="off" />
     <ul id="palette-list" role="listbox"></ul>
@@ -110,5 +137,6 @@
 
   <script src="assets/data.js"></script>
   <script src="assets/main.js"></script>
+  <script src="assets/room.js"></script>
 </body>
 </html>

@@ -17,49 +17,66 @@
   // ── Static content ────────────────────────────────────────
   document.title = `${D.name} — Portfolio`;
   $$("[data-name]").forEach((el) => (el.textContent = D.name));
-  $("[data-role]").textContent = D.role;
+  $$("[data-handle]").forEach((el) => (el.textContent = D.handle));
+  $$("[data-role]").forEach((el) => (el.textContent = D.role));
+  $("#headline").textContent = D.headline;
+  $("#intro").textContent = D.intro;
   $("#about-text").textContent = D.about;
   $("#year").textContent = new Date().getFullYear();
   $("#skills").innerHTML = D.skills.map((s) => `<li>${esc(s)}</li>`).join("");
+  $("#stats").innerHTML = D.stats.map((s) => `<div class="stat"><b>${esc(s.value)}</b><span>${esc(s.label)}</span></div>`).join("");
+  ["#nav-github", "#hero-github"].forEach((sel) => {
+    const a = $(sel);
+    if (D.links.github) a.href = D.links.github;
+    else a.remove();
+  });
   $("#contact-links").innerHTML = linkList()
     .map(([, url, label], i) => `<a class="btn magnetic ${i === 0 ? "primary" : ""}" href="${esc(url)}" ${url.startsWith("mailto:") ? "" : 'target="_blank" rel="noopener"'}>${label}</a>`)
     .join("");
 
-  // Split hero name into letters that react to the cursor.
-  const heroName = $(".hero-name");
-  heroName.innerHTML = D.name
-    .split(" ")
-    .map((w) => `<span class="word">${[...w].map((c) => `<span class="ch">${esc(c)}</span>`).join("")}</span>`)
-    .join(" ");
-  if (!reduceMotion) {
-    heroName.addEventListener("mousemove", (e) => {
-      $$(".ch", heroName).forEach((ch) => {
-        const r = ch.getBoundingClientRect();
-        const dx = e.clientX - (r.left + r.width / 2);
-        const dist = Math.abs(dx);
-        const lift = Math.max(0, 1 - dist / 120);
-        ch.style.transform = `translateY(${-lift * 14}px) rotate(${lift * Math.sign(dx) * -6}deg)`;
-        ch.style.color = lift > 0.35 ? "var(--accent)" : "";
-      });
-    });
-    heroName.addEventListener("mouseleave", () => $$(".ch", heroName).forEach((ch) => (ch.style.transform = ch.style.color = "")));
-  }
+  // "build passed" card: one check line per project, revealed one by one.
+  const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+  const statusText = { live: "shipped", wip: "in progress", archived: "archived" };
+  $("#check-count").textContent = `${D.projects.length} projects · 0 errors`;
+  $("#check-list").innerHTML = D.projects
+    .map((p) => `<li><span class="ok">✓</span>${esc(slug(p.title))} <span class="dim">—</span><span class="st ${esc(p.status)}">${esc(statusText[p.status] || p.status)}</span></li>`)
+    .join("");
 
-  // ── Typewriter ────────────────────────────────────────────
-  const tw = $("#typewriter");
-  if (reduceMotion) tw.textContent = D.taglines[0];
+  // ── Rotating word (typewriter) ────────────────────────────
+  const rw = $("#rotating-word");
+  const words = D.rotatingWords;
+  if (reduceMotion) rw.textContent = words[0];
   else {
-    let i = 0, j = 0, deleting = false;
+    let i = 0, j = 0, deleting = false, timer;
     const tick = () => {
-      const word = D.taglines[i];
-      tw.textContent = word.slice(0, j);
-      if (!deleting && j === word.length) { deleting = true; return setTimeout(tick, 1800); }
-      if (deleting && j === 0) { deleting = false; i = (i + 1) % D.taglines.length; }
+      const word = words[i];
       j += deleting ? -1 : 1;
-      setTimeout(tick, deleting ? 30 : 60);
+      rw.textContent = word.slice(0, j);
+      let delay = deleting ? 60 : 110;
+      if (!deleting && j === word.length) { deleting = true; delay = 2200; }
+      else if (deleting && j === 0) { deleting = false; i = (i + 1) % words.length; delay = 300; }
+      timer = setTimeout(tick, delay);
     };
     tick();
+    document.addEventListener("visibilitychange", () => { clearTimeout(timer); if (!document.hidden) timer = setTimeout(tick, 400); });
   }
+
+  // ── Nav: scrolled state, progress bar, mobile menu ────────
+  const nav = $("#nav"), progress = $("#scroll-progress");
+  let ticking = false;
+  const onScroll = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    nav.classList.toggle("scrolled", scrollY > 30);
+    progress.style.transform = `scaleX(${max > 0 ? Math.min(1, scrollY / max) : 0})`;
+    ticking = false;
+  };
+  addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  onScroll();
+
+  const burger = $("#hamburger"), navLinks = $("#nav-links");
+  const setMenu = (open) => { navLinks.classList.toggle("open", open); burger.setAttribute("aria-expanded", open); };
+  burger.addEventListener("click", () => setMenu(!navLinks.classList.contains("open")));
+  navLinks.addEventListener("click", (e) => { if (e.target.closest("a")) setMenu(false); });
 
   // ── Projects: filters, cards, tilt, modal ─────────────────
   const grid = $("#project-grid");
@@ -72,14 +89,11 @@
     .map(
       (p) => `
     <button class="card reveal" data-id="${esc(p.id)}" data-tags="${esc(p.tags.join(" "))}" style="--c:${esc(p.color || "var(--accent)")}">
-      <div class="card-top">
-        <span class="card-icon">${esc(p.title[0])}</span>
-        <span class="status ${esc(p.status)}">${esc(p.status)} · ${esc(p.year)}</span>
-      </div>
+      <div class="card-label"><span class="card-dot"></span>${esc(p.tags[0] || "project")}<span class="yr">${esc(p.year)}</span></div>
       <h3>${esc(p.title)}</h3>
       <p>${esc(p.summary)}</p>
       <ul class="stack">${p.stack.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>
-      <span class="arrow" aria-hidden="true">↗</span>
+      <div class="card-foot"><span>${esc(statusText[p.status] || p.status)} · view details</span><span class="arrow" aria-hidden="true">↗</span></div>
     </button>`
     )
     .join("");
@@ -96,7 +110,7 @@
       const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
       card.style.setProperty("--mx", `${x * 100}%`);
       card.style.setProperty("--my", `${y * 100}%`);
-      if (!reduceMotion) card.style.transform = `perspective(900px) rotateX(${(0.5 - y) * 8}deg) rotateY(${(x - 0.5) * 8}deg) translateY(-4px)`;
+      if (!reduceMotion) card.style.transform = `perspective(900px) rotateX(${(0.5 - y) * 6}deg) rotateY(${(x - 0.5) * 6}deg) translateY(-4px)`;
     });
     card.addEventListener("pointerleave", () => (card.style.transform = ""));
     card.addEventListener("click", () => openProject(card.dataset.id));
@@ -114,9 +128,9 @@
       <div class="modal-hero" style="--c:${esc(p.color || "var(--accent)")}"></div>
       <div class="modal-body">
         <h3>${esc(p.title)}</h3>
-        <div class="meta">${esc(p.year)} · ${esc(p.status)} · ${p.tags.map(esc).join(", ")}</div>
+        <div class="meta">${esc(p.year)} · ${esc(statusText[p.status] || p.status)} · ${p.tags.map(esc).join(", ")}</div>
         <p>${esc(p.description)}</p>
-        <ul class="stack">${p.stack.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>
+        <ul class="stack" style="--c:${esc(p.color || "var(--accent)")}">${p.stack.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>
         ${links ? `<div class="modal-links">${links}</div>` : ""}
       </div>`;
     modal.showModal();
@@ -126,15 +140,22 @@
   modal.addEventListener("click", (e) => { if (e.target === modal) modal.close(); });
 
   // ── Scroll reveal ─────────────────────────────────────────
+  const checkItems = $$("#check-list li");
   const io = new IntersectionObserver(
-    (entries) => entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } }),
+    (entries) =>
+      entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        en.target.classList.add("in");
+        if (en.target.id === "check-card") checkItems.forEach((li, i) => setTimeout(() => li.classList.add("in"), 250 + i * 220));
+        io.unobserve(en.target);
+      }),
     { threshold: 0.12 }
   );
   $$(".reveal").forEach((el, i) => { el.style.transitionDelay = `${(i % 4) * 70}ms`; io.observe(el); });
 
-  // ── Theme ─────────────────────────────────────────────────
+  // ── Theme (dark by default; light is opt-in) ──────────────
   const root = document.documentElement;
-  const isDark = () => (root.dataset.theme ? root.dataset.theme === "dark" : !matchMedia("(prefers-color-scheme: light)").matches);
+  const isDark = () => root.dataset.theme !== "light";
   function toggleTheme() {
     root.dataset.theme = isDark() ? "light" : "dark";
     try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
@@ -150,7 +171,7 @@
     if (e.pointerType === "mouse") {
       cursor.classList.add("on");
       cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-      cursor.classList.toggle("hover", !!e.target.closest("a, button, .card, input"));
+      cursor.classList.toggle("hover", !!e.target.closest("a, button, .card, input, .obj.project, .obj.toggle"));
     }
   });
   document.addEventListener("pointerleave", () => { cursor.classList.remove("on"); mouse.active = false; });
@@ -160,50 +181,42 @@
       $$(".magnetic").forEach((b) => {
         const r = b.getBoundingClientRect();
         const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
-        const near = Math.hypot(dx, dy) < 90;
-        b.style.transform = near ? `translate(${dx * 0.25}px, ${dy * 0.35}px)` : "";
+        b.style.transform = Math.hypot(dx, dy) < 90 ? `translate(${dx * 0.22}px, ${dy * 0.3}px)` : "";
       });
     });
   }
 
-  // ── Background: interactive particle constellation ───────
+  // ── Background: subtle particle constellation ─────────────
   const canvas = $("#bg"), ctx = canvas.getContext("2d");
   let pts = [], W = 0, H = 0, dpr = 1;
   function resize() {
     dpr = Math.min(devicePixelRatio || 1, 2);
     W = canvas.width = innerWidth * dpr; H = canvas.height = innerHeight * dpr;
-    const n = Math.min(110, Math.floor((innerWidth * innerHeight) / 14000));
-    pts = Array.from({ length: n }, () => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - 0.5) * 0.3 * dpr, vy: (Math.random() - 0.5) * 0.3 * dpr }));
+    const n = Math.min(70, Math.floor((innerWidth * innerHeight) / 22000));
+    pts = Array.from({ length: n }, () => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - 0.5) * 0.25 * dpr, vy: (Math.random() - 0.5) * 0.25 * dpr }));
   }
   function draw() {
     ctx.clearRect(0, 0, W, H);
     const dark = isDark();
-    const dotColor = dark ? "rgba(255,255,255,0.5)" : "rgba(20,20,40,0.35)";
-    const link = 130 * dpr, mx = mouse.x * dpr, my = mouse.y * dpr;
+    const link = 120 * dpr, mx = mouse.x * dpr, my = mouse.y * dpr;
+    ctx.fillStyle = dark ? "rgba(255,255,255,0.35)" : "rgba(30,30,50,0.25)";
     for (const p of pts) {
       p.x += p.vx; p.y += p.vy;
       if (p.x < 0 || p.x > W) p.vx *= -1;
       if (p.y < 0 || p.y > H) p.vy *= -1;
       if (mouse.active) {
         const dx = p.x - mx, dy = p.y - my, d = Math.hypot(dx, dy);
-        if (d < 120 * dpr && d > 0) { p.x += (dx / d) * 1.2 * dpr; p.y += (dy / d) * 1.2 * dpr; }
+        if (d < 110 * dpr && d > 0) { p.x += (dx / d) * dpr; p.y += (dy / d) * dpr; }
       }
-      ctx.fillStyle = dotColor;
-      ctx.beginPath(); ctx.arc(p.x, p.y, 1.4 * dpr, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x, p.y, 1.2 * dpr, 0, Math.PI * 2); ctx.fill();
     }
+    ctx.lineWidth = dpr;
     for (let i = 0; i < pts.length; i++) {
       for (let j = i + 1; j < pts.length; j++) {
         const a = pts[i], b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y);
         if (d < link) {
-          ctx.strokeStyle = `rgba(124,92,255,${(1 - d / link) * (dark ? 0.35 : 0.25)})`;
-          ctx.lineWidth = dpr; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-        }
-      }
-      if (mouse.active) {
-        const a = pts[i], d = Math.hypot(a.x - mx, a.y - my);
-        if (d < link * 1.4) {
-          ctx.strokeStyle = `rgba(0,209,178,${(1 - d / (link * 1.4)) * 0.5})`;
-          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(mx, my); ctx.stroke();
+          ctx.strokeStyle = `rgba(255,125,65,${(1 - d / link) * (dark ? 0.18 : 0.14)})`;
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
         }
       }
     }
@@ -249,6 +262,7 @@
     },
     contact: () => print(linkList().map(([k, url]) => `  ${k.padEnd(10)} <a href="${esc(url)}" target="_blank" rel="noopener">${esc(url.replace("mailto:", ""))}</a>`).join("\n")),
     theme: () => print(`theme → ${toggleTheme()}`),
+    lamp: () => print(`lamp → ${window.PortfolioRoom ? window.PortfolioRoom.toggleLamp() : "n/a"}`),
     filter: (tag) => {
       if (!tags.includes(tag)) return print(`filter: unknown tag. Try: ${tags.join(", ")}`, "err");
       filterBy(tag); $("#projects").scrollIntoView({ behavior: "smooth" });
@@ -256,7 +270,7 @@
     },
     goto: (sec) => {
       const el = sec && document.getElementById(sec);
-      if (!el) return print("goto: try projects, about, terminal or contact", "err");
+      if (!el) return print("goto: try studio, projects, about, terminal or contact", "err");
       el.scrollIntoView({ behavior: "smooth" });
     },
     date: () => print(new Date().toString()),
@@ -268,7 +282,8 @@
   const cmdHelp = {
     help: "list commands", whoami: "who am I?", about: "a little about me", skills: "what I work with",
     projects: "list projects (alias: ls)", "open <n>": "open project details", "filter <tag>": "filter the project grid",
-    "goto <section>": "scroll to a section", contact: "how to reach me", theme: "toggle light/dark", history: "command history", clear: "clear the screen",
+    "goto <section>": "scroll to a section", contact: "how to reach me", theme: "toggle light/dark", lamp: "flip the desk lamp in the room",
+    history: "command history", clear: "clear the screen",
   };
 
   function run(raw) {
@@ -302,11 +317,13 @@
   const go = (id) => () => document.getElementById(id).scrollIntoView({ behavior: "smooth" });
   const actions = [
     ...D.projects.map((p) => ({ label: p.title, hint: "project", run: () => openProject(p.id) })),
+    { label: "Go to the Room", hint: "section", run: go("studio") },
     { label: "Go to Projects", hint: "section", run: go("projects") },
     { label: "Go to About", hint: "section", run: go("about") },
     { label: "Open Terminal", hint: "section", run: () => { go("terminal")(); setTimeout(() => input.focus({ preventScroll: true }), 400); } },
     { label: "Contact me", hint: "section", run: go("contact") },
     { label: "Toggle theme", hint: "action", run: toggleTheme },
+    { label: "Toggle desk lamp", hint: "action", run: () => window.PortfolioRoom && window.PortfolioRoom.toggleLamp() },
     ...linkList().map(([, url, label]) => ({ label: `Open ${label}`, hint: "link", run: () => window.open(url, "_blank", "noopener") })),
   ];
   let filtered = actions, sel = 0;
@@ -331,4 +348,7 @@
   addEventListener("keydown", (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); palette.open ? palette.close() : openPalette(); }
   });
+
+  // Shared with room.js
+  window.PortfolioUI = { openProject, isDark, esc, statusText };
 })();
