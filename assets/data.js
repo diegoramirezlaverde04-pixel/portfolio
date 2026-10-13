@@ -1,120 +1,183 @@
 // ─────────────────────────────────────────────────────────────
-//  Edit this file to make the portfolio yours.
-//  Everything on the page (room, project cards, terminal,
-//  command palette) is generated from the data below.
+//  Edit this file to update the portfolio.
+//  Everything on the page (room, project cards, project pages,
+//  terminal, command palette) is generated from the data below.
 // ─────────────────────────────────────────────────────────────
 
 window.PORTFOLIO = {
-  name: "Diego Ramirez Laverde",
+  name: "Diego Ramirez",
   handle: "diego",
-  role: "Urban Planner",
+  role: "Urban Planning Student · UC DAAP",
   // Hero headline: the first line types out each of these words in turn,
   // followed by the fixed `headline` text.
-  rotatingWords: ["Streets", "Neighborhoods", "Transit", "Parks", "Cities"],
-  headline: "designed for people.",
+  rotatingWords: ["Pathways", "Streets", "Campuses", "Intersections", "Communities"],
+  headline: "designed for everyone.",
   intro:
-    "I'm an urban planner working at the intersection of land use, mobility and community. " +
-    "Every object in this studio is a project. Hover to explore, click to open.",
-  // Short stats shown under the room. Keep these honest.
+    "I'm an urban planning student at the University of Cincinnati focused on accessibility, " +
+    "universal design and walkable places. Every glowing object in this studio is a project. " +
+    "Hover to explore, click to open.",
+  // Short facts shown under the room (all from the résumé).
   stats: [
-    { value: "5", label: "featured projects" },
-    { value: "GIS", label: "spatial analysis" },
-    { value: "100%", label: "people-first" },
-    { value: "∞", label: "walkable blocks to fix" },
+    { value: "310 sq ft", label: "ADA tiny house designed" },
+    { value: "15+", label: "universal design features" },
+    { value: "1 of 16", label: "MDA scholars (350+ applicants)" },
+    { value: "10K+", label: "BLINK installation viewers" },
   ],
-  location: "Somewhere walkable",
+  location: "Cincinnati, OH",
   about:
-    "I care about cities that work for the people who live in them: safe streets, good transit, " +
-    "parks within a short walk and housing people can afford. I combine spatial analysis, design " +
-    "and community engagement to turn plans into places.",
-  skills: ["ArcGIS Pro", "QGIS", "AutoCAD", "SketchUp", "Adobe Illustrator", "Python", "Zoning & land use", "Community engagement"],
+    "I'm pursuing a Bachelor of Urban Planning at the University of Cincinnati's College of Design, " +
+    "Architecture, Art, and Planning (DAAP), expected May 2029. My work looks at the gap between places " +
+    "that are merely compliant and places that are truly inclusive, using mapping, sketching and 3D " +
+    "modeling to show how people actually move through a city. I'm fluent in Spanish and have advocated " +
+    "with U.S. legislators for accessible infrastructure and inclusive community development.",
+  skills: ["SketchUp", "AutoCAD", "ArcGIS", "Illustrator", "InDesign", "Photoshop", "ADA compliance", "Universal design", "Accessible wayfinding", "Spanish (fluent)"],
+  education: {
+    school: "University of Cincinnati · DAAP",
+    degree: "Bachelor of Urban Planning",
+    date: "Expected May 2029",
+    honors: [
+      "JB's Keys to DMD Educational Scholarship: sole national recipient",
+      "MDA College Scholarship: 1 of 16 selected from 350+ applicants",
+    ],
+  },
+  experience: [
+    { org: "Magdalena Homes", role: "Accessible Housing Design Intern", date: "Jan – Apr 2026", place: "San Francisco, CA (hybrid)" },
+    { org: "Total Home Care Services", role: "Operations & Team Manager", date: "Aug 2022 – Present", place: "Cincinnati, OH" },
+    { org: "Parent Project Muscular Dystrophy", role: "Policy Advocate", date: "Jun 2021 – Mar 2024", place: "Cincinnati, OH" },
+    { org: "NS Pharma", role: "Patient Advocate", date: "Apr 2023 – Apr 2024", place: "Cincinnati, OH" },
+    { org: "Brothers Keepers", role: "Co-Founder", date: "2022", place: "Cincinnati, OH" },
+  ],
 
   links: {
-    email: "mailto:diegoramirezlaverde04@gmail.com",
-    github: "https://github.com/diegoramirezlaverde04-pixel",
-    linkedin: "",          // e.g. "https://www.linkedin.com/in/your-name"
+    email: "mailto:ramiredo@mail.uc.edu",
+    linkedin: "https://www.linkedin.com/in/diegoramirez04",
+    github: "",
     resume: "",            // e.g. "assets/resume.pdf"
   },
 
-  // Each project becomes a glowing object in the room, a card, a modal,
-  // and a terminal entry.
-  //   room   → which object in the room represents it (optional):
-  //            "model" | "map" | "gis" | "board" | "blueprints" | "tree" | "transit"
-  //            Projects without one fill the remaining objects in order.
-  //   tags   → used by the filter chips
-  //   color  → accent color (any hex color)
-  //   status → "live" | "wip" | "archived"
+  // Each project becomes a glowing object in the room, a card, a full
+  // project view, and a terminal entry.
+  //   room     → object in the room: "model" (3D campus table) | "map" (wall map)
+  //              | "monitor" | "house" (shelf) | "blink" (light sculpture)
+  //              (also available: "board" | "blueprints" | "tree")
+  //   viewer3d → true shows the interactive 3D figure-ground model in the project view
+  //   cover   → image shown on the card and at the top of the project view
+  //   gallery → [{ src, caption, group }]; click an image to enlarge it
   projects: [
     {
-      id: "downtown-model",
-      title: "Downtown Infill Plan",
+      id: "campus-mapping",
+      num: "01",
+      title: "Campus Analysis Mapping",
       room: "model",
-      year: 2026,
+      viewer3d: true,
+      context: "UC DAAP coursework",
       status: "live",
-      summary: "Massing study for mixed-use infill around a future transit hub.",
-      description:
-        "Describe the site, the goals (housing units, jobs, public space), the alternatives you tested " +
-        "and what the final concept proposed. Add renders or a link to the full plan.",
-      tags: ["land use", "design"],
-      stack: ["SketchUp", "AutoCAD", "Illustrator"],
-      color: "#ff7d41",
-      links: { live: "", code: "" },
+      summary: "Figure-ground maps of UC's building footprints and pathways, by hand and in AutoCAD and ArcGIS.",
+      description: [
+        "A series of maps highlighting building footprints and pathways at the University of Cincinnati. The work was completed to develop my understanding of figure-ground mapping while gaining experience with ArcGIS, AutoCAD, and hand-drawing techniques.",
+        "Two hand-drawn maps explore the relationship between pedestrian movement and the physical form of the campus. Two AutoCAD maps follow: a white-on-black design highlighting the campus's walkable pathways, and a black-on-white design emphasizing building footprints.",
+      ],
+      tags: ["mapping", "gis"],
+      stack: ["ArcGIS", "AutoCAD", "Hand drawing"],
+      color: "#7fbf3f",
+      cover: "assets/img/campus-color.jpg",
+      gallery: [
+        { src: "assets/img/campus-hand-footprint.jpg", caption: "Hand-drawn building footprint map", group: "Hand drawn" },
+        { src: "assets/img/campus-hand-pathway.jpg", caption: "Hand-drawn pathway map", group: "Hand drawn" },
+        { src: "assets/img/campus-cad-white-on-black.jpg", caption: "AutoCAD white-on-black map: walkable pathways", group: "AutoCAD" },
+        { src: "assets/img/campus-cad-black-on-white.jpg", caption: "AutoCAD black-on-white map: building footprints", group: "AutoCAD" },
+      ],
+      links: {},
     },
     {
-      id: "zoning-explorer",
-      title: "Zoning Map Explorer",
+      id: "inclusive-vs-compliant",
+      num: "02",
+      title: "Inclusive vs. Compliant Pathways",
       room: "map",
-      year: 2026,
+      context: "UC DAAP coursework",
       status: "live",
-      summary: "An interactive map that explains what can be built on every parcel.",
-      description:
-        "What question did the map answer? Which datasets did you join? Who used it and what did they learn?",
-      tags: ["gis", "land use"],
-      stack: ["ArcGIS Pro", "ArcGIS Online"],
-      color: "#7c5cff",
-      links: { live: "", code: "" },
+      summary: "Where UC's wheelchair-accessible routes split from the paths most students actually use.",
+      description: [
+        "This project highlights the design of wheelchair-accessible pathways at the University of Cincinnati. While many pathways meet accessibility requirements, they are often separated from the routes most commonly used by students. The project examines the relationship between accessibility and pedestrian movement, emphasizing the importance of integrating accessible pathways into the primary circulation network.",
+        "Using Adobe Illustrator and ArcGIS, I mapped the pathway network through the lens of wheelchair accessibility, with color gradients showing strong, moderate and poor integration. Perspective sketches and SketchUp models compare the ramp at Lindner Hall, which shares the main entrance route, with Langsam Library's zig-zag ramp and the Clifton Court Hall ramp that ends before reaching ground level.",
+      ],
+      tags: ["accessibility", "gis", "design"],
+      stack: ["ArcGIS", "Illustrator", "SketchUp", "Hand sketching"],
+      color: "#2bb673",
+      cover: "assets/img/inclusive-cover.jpg",
+      gallery: [
+        { src: "assets/img/inclusive-map.jpg", caption: "Pathway integration map: green = strong, yellow = moderate, red = poor integration", group: "Integration map" },
+        { src: "assets/img/inclusive-sketch-linder.jpg", caption: "Sketch: ramp to Lindner Hall (well integrated)", group: "Sketches" },
+        { src: "assets/img/inclusive-sketch-clifton.jpg", caption: "Sketch: stairway to Clifton Court Hall", group: "Sketches" },
+        { src: "assets/img/inclusive-sketch-langsam.jpg", caption: "Sketch: ramp & stairway to Langsam Library", group: "Sketches" },
+        { src: "assets/img/inclusive-3d-linder.jpg", caption: "3D view: Lindner main entrance ramp", group: "3D views" },
+        { src: "assets/img/inclusive-3d-clifton-a.jpg", caption: "3D view: Clifton Court Hall stairway, view A", group: "3D views" },
+        { src: "assets/img/inclusive-3d-clifton-b.jpg", caption: "3D view: Clifton Court Hall stairway, view B", group: "3D views" },
+      ],
+      links: {},
     },
     {
-      id: "park-access",
-      title: "Park Access Analysis",
-      room: "gis",
-      year: 2025,
+      id: "hopkins-dalton",
+      num: "03",
+      title: "Hopkins St & Dalton Ave Redevelopment",
+      room: "monitor",
+      context: "UC DAAP coursework",
       status: "live",
-      summary: "Network analysis of which neighborhoods lack a park within a 10-minute walk.",
-      description:
-        "Explain the method (network buffers, demographic overlays), the key finding and the recommendation it led to.",
-      tags: ["gis", "data"],
-      stack: ["QGIS", "Python", "Census data"],
-      color: "#50c878",
-      links: { live: "", code: "" },
+      summary: "Reimagining the car-centric intersection at Union Terminal's entrance as a walkable place.",
+      description: [
+        "This project reimagines the intersection at the entrance to Union Terminal, designed in SketchUp to prioritize walkability and foster a stronger sense of community.",
+        "Street views of the existing site (an abandoned warehouse, a gated opening in the wall and a car-centric intersection) are paired with SketchUp renderings of the redevelopment: a four-way intersection with a pedestrian-friendly environment, ground-floor shops and a new pathway with a ramp and stairway through the wall.",
+      ],
+      tags: ["design", "walkability"],
+      stack: ["SketchUp", "Google Street View"],
+      color: "#f2a33a",
+      cover: "assets/img/hopkins-after-intersection.jpg",
+      gallery: [
+        { src: "assets/img/hopkins-before-aerial.jpg", caption: "Before: aerial view prior to redevelopment", group: "Before → after" },
+        { src: "assets/img/hopkins-after-aerial.jpg", caption: "After: bird's-eye view of the full redevelopment", group: "Before → after" },
+        { src: "assets/img/hopkins-before-intersection.jpg", caption: "Before: car-centric intersection", group: "Before → after" },
+        { src: "assets/img/hopkins-after-intersection.jpg", caption: "After: four-way intersection with a pedestrian-friendly environment", group: "Before → after" },
+        { src: "assets/img/hopkins-before-warehouse.jpg", caption: "Before: abandoned warehouse", group: "Site & new connections" },
+        { src: "assets/img/hopkins-after-coffee.jpg", caption: "After: coffee shop and storefronts", group: "Site & new connections" },
+        { src: "assets/img/hopkins-before-gate.jpg", caption: "Before: gated opening", group: "Site & new connections" },
+        { src: "assets/img/hopkins-after-ramp-entrance.jpg", caption: "After: pathway ramp and stairway entrance", group: "Site & new connections" },
+        { src: "assets/img/hopkins-after-ramp-exit.jpg", caption: "After: pathway ramp and stairway exit", group: "Site & new connections" },
+      ],
+      links: {},
     },
     {
-      id: "community-workshops",
-      title: "Community Workshop Series",
-      room: "board",
-      year: 2025,
-      status: "archived",
-      summary: "Engagement program that gathered 300+ resident ideas for a corridor plan.",
-      description:
-        "How did you reach people who don't usually come to meetings? What tools did you use and how did the feedback shape the plan?",
-      tags: ["engagement"],
-      stack: ["Facilitation", "Survey design", "Miro"],
-      color: "#f5c518",
-      links: { live: "", code: "" },
+      id: "magdalena-tiny-house",
+      num: "04",
+      title: "ADA Tiny House · Magdalena Homes",
+      room: "house",
+      context: "Internship · Jan – Apr 2026",
+      status: "live",
+      summary: "Magdalena Homes' first ADA-compliant tiny house, designed from scratch in 12 weeks.",
+      description: [
+        "As an Accessible Housing Design Intern, I independently designed Magdalena Homes' first ADA-compliant tiny house from scratch in AutoCAD and SketchUp.",
+        "Over 12 weeks I incorporated 15+ universal design features into the spatial layout and accessibility of a 310 sq ft footprint. I also managed regulatory compliance and documentation for 5 homes imported from Colombia, coordinating across the DMV, customs brokers and logistics companies to process 40+ documents.",
+      ],
+      tags: ["accessibility", "housing", "design"],
+      stack: ["AutoCAD", "SketchUp", "ADA compliance"],
+      color: "#5b8def",
+      links: {},
     },
     {
-      id: "complete-streets",
-      title: "Complete Streets Redesign",
-      room: "blueprints",
-      year: 2024,
-      status: "wip",
-      summary: "Street section redesign adding protected bike lanes and wider sidewalks.",
-      description:
-        "Show before/after street sections, the safety data behind the redesign and how you balanced parking, transit and space for people walking and cycling.",
-      tags: ["mobility", "design"],
-      stack: ["Streetmix", "AutoCAD", "Crash data"],
-      color: "#64b4ff",
-      links: { live: "", code: "" },
+      id: "blink-future-city",
+      num: "05",
+      title: "BLINK Festival: \"Future City\"",
+      room: "blink",
+      context: "Student designer · Oct 2024",
+      status: "live",
+      summary: "An illuminated wearable sculpture about urban sustainability for BLINK, Cincinnati's light and art festival.",
+      description: [
+        "For BLINK, the nation's largest light and art festival, I designed an illuminated wearable sculpture featuring urban sustainability.",
+        "I engineered and prototyped 15+ pieces from recycled cardboard and LED lighting within a one-week build. The work was featured on the BLINK website, in the Cincinnati Enquirer and on UC DAAP social media, reaching 10K+ viewers.",
+      ],
+      tags: ["installation", "sustainability"],
+      stack: ["Recycled cardboard", "LED lighting", "Prototyping"],
+      color: "#b06bf2",
+      links: {},
     },
   ],
 };

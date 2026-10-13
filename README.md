@@ -1,37 +1,26 @@
-# Interactive Urban Planning Portfolio
+# Diego Ramirez · Urban Planning Portfolio
 
-A personal portfolio built around an **interactive isometric planning studio**. Each object in the room is a project: hover it to see a label, click it to open the details. No framework, no build step, no image files. The room is drawn in SVG by `assets/room.js`.
+An interactive portfolio built around an **isometric planning studio**. Each glowing object in the room is a project: hover it for a label, click it to open the full project with images. No framework and no build step; the room is drawn in SVG by `assets/room.js`.
 
-What's in it:
-
-- **The studio** (hero): city model table, zoning map, GIS monitor, community pinboard, blueprint bin, street tree and a transit model shelf. Objects linked to a project glow and pulse, and the chips under the room highlight them too. Click the desk lamp to switch it off and on.
-- **Project grid** with filters, tilt cards and detail modals
-- **Working terminal**: try `help`, `projects`, `open 1`, `filter gis`, `lamp`, `theme`
-- **Command palette** on `Ctrl/⌘ + K`
-- Light/dark theme (the window switches between night and day), scroll progress bar, scroll reveals
-- Honors `prefers-reduced-motion` and works on phones
-
-## Make it yours
-
-All content lives in **`assets/data.js`**: name, headline words, intro, stats, skills, links and projects.
-
-Each project can choose its object in the room with `room`:
-
-| `room` value | Object |
+| Object in the room | Project |
 | --- | --- |
-| `model` | city model table (center) |
-| `map` | zoning map on the left wall |
-| `gis` | GIS monitor on the desk |
-| `board` | community pinboard |
-| `blueprints` | blueprint bin |
-| `tree` | street tree in a planter |
-| `transit` | tram model on the shelf |
+| 3D campus model on the center table | 01 Campus Analysis Mapping (opens an interactive 3D figure-ground model) |
+| Pathway-integration map on the wall | 02 Inclusive vs. Compliant Pathways |
+| Monitor with a street render | 03 Hopkins St & Dalton Ave Redevelopment |
+| Tiny house model on the shelf | 04 ADA Tiny House · Magdalena Homes |
+| Glowing cardboard light sculpture | 05 BLINK Festival: "Future City" |
 
-Projects without a `room` value fill the free objects in order. Objects with no project stay as decoration. A project's `color` also tints its object.
+Also: project cards with galleries and a lightbox, About with education and experience, a working terminal (`help`, `open 1`, `lamp`), a `Ctrl/⌘ + K` command palette, and light/dark themes. Respects `prefers-reduced-motion`.
+
+## Editing content
+
+- **Text, projects, links:** `assets/data.js`. Each project's `room` value picks its object; `gallery` lists its images.
+- **Images:** `assets/img/` (cropped from the print portfolio).
+- **3D campus model:** `assets/campus3d.js` is generated from the AutoCAD black-on-white figure-ground map: each grid cell holds a building id and an illustrative height (scaled by footprint, not surveyed). `assets/campus3d-viewer.js` renders it with three.js (bundled in `assets/vendor/`, MIT license).
 
 ## Run locally
 
-Open `index.html` in a browser, or serve the folder:
+Serve the folder (the 3D viewer needs a web server; opening the file directly falls back to the CDN and skips the map texture):
 
 ```bash
 npx serve .

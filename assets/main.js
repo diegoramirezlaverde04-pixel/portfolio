@@ -25,18 +25,29 @@
   $("#year").textContent = new Date().getFullYear();
   $("#skills").innerHTML = D.skills.map((s) => `<li>${esc(s)}</li>`).join("");
   $("#stats").innerHTML = D.stats.map((s) => `<div class="stat"><b>${esc(s.value)}</b><span>${esc(s.label)}</span></div>`).join("");
-  ["#nav-github", "#hero-github"].forEach((sel) => {
+  ["#nav-cta", "#hero-linkedin"].forEach((sel) => {
     const a = $(sel);
-    if (D.links.github) a.href = D.links.github;
+    if (D.links.linkedin) a.href = D.links.linkedin;
     else a.remove();
   });
+  const paras = (d) => (Array.isArray(d) ? d : [d]).map((t) => `<p>${esc(t)}</p>`).join("");
+
+  // About: education + experience timeline
+  if (D.education) {
+    const e = D.education;
+    $("#education").innerHTML = `<div class="tl-item"><b>${esc(e.degree)}</b><span>${esc(e.school)}</span><em>${esc(e.date)}</em>
+      ${e.honors?.length ? `<ul>${e.honors.map((h) => `<li>${esc(h)}</li>`).join("")}</ul>` : ""}</div>`;
+  }
+  $("#experience").innerHTML = (D.experience || [])
+    .map((x) => `<div class="tl-item"><b>${esc(x.role)}</b><span>${esc(x.org)} · ${esc(x.place)}</span><em>${esc(x.date)}</em></div>`)
+    .join("");
   $("#contact-links").innerHTML = linkList()
     .map(([, url, label], i) => `<a class="btn magnetic ${i === 0 ? "primary" : ""}" href="${esc(url)}" ${url.startsWith("mailto:") ? "" : 'target="_blank" rel="noopener"'}>${label}</a>`)
     .join("");
 
   // "build passed" card: one check line per project, revealed one by one.
   const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
-  const statusText = { live: "shipped", wip: "in progress", archived: "archived" };
+  const statusText = { live: "complete", wip: "in progress", archived: "archived" };
   $("#check-count").textContent = `${D.projects.length} projects · 0 errors`;
   $("#check-list").innerHTML = D.projects
     .map((p) => `<li><span class="ok">✓</span>${esc(slug(p.title))} <span class="dim">—</span><span class="st ${esc(p.status)}">${esc(statusText[p.status] || p.status)}</span></li>`)
@@ -88,12 +99,13 @@
   grid.innerHTML = D.projects
     .map(
       (p) => `
-    <button class="card reveal" data-id="${esc(p.id)}" data-tags="${esc(p.tags.join(" "))}" style="--c:${esc(p.color || "var(--accent)")}">
-      <div class="card-label"><span class="card-dot"></span>${esc(p.tags[0] || "project")}<span class="yr">${esc(p.year)}</span></div>
+    <button class="card reveal ${p.cover ? "has-cover" : ""}" data-id="${esc(p.id)}" data-tags="${esc(p.tags.join(" "))}" style="--c:${esc(p.color || "var(--accent)")}">
+      ${p.cover ? `<div class="card-cover"><img src="${esc(p.cover)}" alt="" loading="lazy"/></div>` : `<div class="card-cover blank"><span>${esc(p.num || "")}</span></div>`}
+      <div class="card-label"><span class="card-dot"></span>${esc(p.num ? p.num + " · " : "")}${esc(p.tags[0] || "project")}<span class="yr">${esc(p.context || p.year || "")}</span></div>
       <h3>${esc(p.title)}</h3>
       <p>${esc(p.summary)}</p>
       <ul class="stack">${p.stack.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>
-      <div class="card-foot"><span>${esc(statusText[p.status] || p.status)} · view details</span><span class="arrow" aria-hidden="true">↗</span></div>
+      <div class="card-foot"><span>${p.gallery?.length ? `${p.gallery.length} images · ` : ""}view project</span><span class="arrow" aria-hidden="true">↗</span></div>
     </button>`
     )
     .join("");
@@ -120,24 +132,62 @@
   function openProject(id) {
     const p = D.projects.find((x) => x.id === id);
     if (!p) return false;
+    const c = esc(p.color || "var(--accent)");
     const links = [
-      p.links?.live && `<a class="btn primary" href="${esc(p.links.live)}" target="_blank" rel="noopener">Live demo ↗</a>`,
-      p.links?.code && `<a class="btn" href="${esc(p.links.code)}" target="_blank" rel="noopener">Source code ↗</a>`,
+      p.links?.live && `<a class="btn primary" href="${esc(p.links.live)}" target="_blank" rel="noopener">View live ↗</a>`,
+      p.links?.code && `<a class="btn" href="${esc(p.links.code)}" target="_blank" rel="noopener">Files ↗</a>`,
     ].filter(Boolean).join("");
+    // Gallery grouped by `group`, in data order
+    const groups = [];
+    (p.gallery || []).forEach((g, i) => {
+      let grp = groups.find((x) => x.name === (g.group || ""));
+      if (!grp) groups.push((grp = { name: g.group || "", items: [] }));
+      grp.items.push({ ...g, i });
+    });
+    const gallery = groups.map((g) => `
+      ${g.name ? `<h4 class="gal-title mono">${esc(g.name)}</h4>` : ""}
+      <div class="gallery">${g.items.map((it) => `
+        <figure><button class="gal-img" data-i="${it.i}" aria-label="Enlarge: ${esc(it.caption)}"><img src="${esc(it.src)}" alt="${esc(it.caption)}" loading="lazy"/></button>
+        <figcaption>${esc(it.caption)}</figcaption></figure>`).join("")}</div>`).join("");
     $("#modal-content").innerHTML = `
-      <div class="modal-hero" style="--c:${esc(p.color || "var(--accent)")}"></div>
+      <div class="modal-hero ${p.cover ? "img" : ""}" style="--c:${c}">${p.cover ? `<img src="${esc(p.cover)}" alt=""/>` : ""}
+        <span class="modal-num">${esc(p.num || "")}</span></div>
       <div class="modal-body">
         <h3>${esc(p.title)}</h3>
-        <div class="meta">${esc(p.year)} · ${esc(statusText[p.status] || p.status)} · ${p.tags.map(esc).join(", ")}</div>
-        <p>${esc(p.description)}</p>
-        <ul class="stack" style="--c:${esc(p.color || "var(--accent)")}">${p.stack.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>
+        <div class="meta">${esc(p.context || p.year || "")} · ${p.tags.map(esc).join(", ")}</div>
+        ${p.viewer3d && window.mountCampus3D ? `<div class="viewer3d" id="viewer3d"></div>` : ""}
+        <div class="modal-text">${paras(p.description)}</div>
+        <ul class="stack" style="--c:${c}">${p.stack.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>
+        ${gallery}
         ${links ? `<div class="modal-links">${links}</div>` : ""}
       </div>`;
+    $$(".gal-img", modal).forEach((b) => b.addEventListener("click", () => openLightbox(p, +b.dataset.i)));
     modal.showModal();
+    modal.scrollTop = 0;
+    const v = $("#viewer3d", modal);
+    if (v) unmount3d = window.mountCampus3D(v);
     return true;
   }
+  let unmount3d = null;
+  modal.addEventListener("close", () => { if (unmount3d) { unmount3d(); unmount3d = null; } });
   $("#modal-close").addEventListener("click", () => modal.close());
   modal.addEventListener("click", (e) => { if (e.target === modal) modal.close(); });
+
+  // Lightbox for gallery images (← → to browse, Esc to close)
+  const lb = $("#lightbox"), lbImg = $("#lb-img"), lbCap = $("#lb-cap");
+  let lbProject = null, lbIndex = 0;
+  function showLb() {
+    const g = lbProject.gallery[lbIndex];
+    lbImg.src = g.src; lbImg.alt = g.caption;
+    lbCap.textContent = `${lbIndex + 1} / ${lbProject.gallery.length} · ${g.caption}`;
+  }
+  function openLightbox(p, i) { lbProject = p; lbIndex = i; showLb(); lb.showModal(); }
+  const step = (d) => { lbIndex = (lbIndex + d + lbProject.gallery.length) % lbProject.gallery.length; showLb(); };
+  $("#lb-prev").addEventListener("click", () => step(-1));
+  $("#lb-next").addEventListener("click", () => step(1));
+  $("#lb-close").addEventListener("click", () => lb.close());
+  lb.addEventListener("click", (e) => { if (e.target === lb) lb.close(); });
+  lb.addEventListener("keydown", (e) => { if (e.key === "ArrowLeft") step(-1); if (e.key === "ArrowRight") step(1); });
 
   // ── Scroll reveal ─────────────────────────────────────────
   const checkItems = $$("#check-list li");
@@ -153,7 +203,7 @@
   );
   $$(".reveal").forEach((el, i) => { el.style.transitionDelay = `${(i % 4) * 70}ms`; io.observe(el); });
 
-  // ── Theme (dark by default; light is opt-in) ──────────────
+  // ── Theme (light by default, like the print portfolio) ────
   const root = document.documentElement;
   const isDark = () => root.dataset.theme !== "light";
   function toggleTheme() {
@@ -215,7 +265,7 @@
       for (let j = i + 1; j < pts.length; j++) {
         const a = pts[i], b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y);
         if (d < link) {
-          ctx.strokeStyle = `rgba(255,125,65,${(1 - d / link) * (dark ? 0.18 : 0.14)})`;
+          ctx.strokeStyle = `rgba(43,182,115,${(1 - d / link) * (dark ? 0.2 : 0.16)})`;
           ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
         }
       }

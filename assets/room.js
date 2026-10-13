@@ -58,7 +58,7 @@
   const onTop = (x, y, z) => { const [ex, ey] = P(x, y, z); return `matrix(${C} ${N} ${-C} ${N} ${ex} ${ey})`; }; // plane z=const
 
   // ── Map projects onto room objects ────────────────────────
-  const SLOTS = ["model", "map", "gis", "board", "blueprints", "tree", "transit"];
+  const SLOTS = ["model", "map", "monitor", "house", "blink", "board", "blueprints", "tree"];
   const bySlot = {};
   const free = [...SLOTS];
   D.projects.forEach((p) => { if (p.room && free.includes(p.room)) { bySlot[p.room] = p; free.splice(free.indexOf(p.room), 1); } });
@@ -84,7 +84,7 @@
       <stop offset="0" style="stop-color:var(--sky-1)"/><stop offset="1" style="stop-color:var(--sky-2)"/>
     </linearGradient>
     <radialGradient id="lampGlow"><stop offset="0" stop-color="#ffd59a" stop-opacity=".7"/><stop offset=".45" stop-color="#ffb35c" stop-opacity=".22"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></radialGradient>
-    <radialGradient id="heat"><stop offset="0" stop-color="#ff5a28" stop-opacity=".9"/><stop offset=".5" stop-color="#f5c518" stop-opacity=".45"/><stop offset="1" stop-color="#f5c518" stop-opacity="0"/></radialGradient>
+    <radialGradient id="blinkGlow"><stop offset="0" stop-color="#d79bff" stop-opacity=".45"/><stop offset="1" stop-color="#d79bff" stop-opacity="0"/></radialGradient>
   </defs>`;
 
   // ── Shell: floor slab, walls, baseboards ──────────────────
@@ -103,41 +103,42 @@
   s += poly([P(0, 0, 0), P(X, 0, 0), P(X, 0, 0.3), P(0, 0, 0.3)], "var(--base-r)");
   s += `</g>`;
 
-  // ── Zoning map on the left wall (slot: map) ───────────────
+  // ── Pathway-integration map on the left wall (slot: map) ─
   {
     const y1 = 1.2, y2 = 5.8, z1 = 2.9, z2 = 6.2, w = (y2 - y1) * S, h = (z2 - z1) * S;
-    const col = colorOf("map", "#7c5cff");
-    let inner = poly([P(0.03, y1, z1), P(0.03, y2, z1), P(0.03, y2, z2), P(0.03, y1, z2)], "#f4efe4");
+    let inner = poly([P(0.03, y1, z1), P(0.03, y2, z1), P(0.03, y2, z2), P(0.03, y1, z2)], "#f7f4ec");
+    const blocks = [[10, 10, 22, 14], [36, 8, 16, 20], [58, 12, 26, 12], [92, 8, 18, 26], [118, 14, 14, 18], [12, 32, 14, 24], [40, 40, 30, 20], [76, 36, 12, 30], [100, 48, 24, 14], [20, 66, 26, 12], [60, 70, 18, 10], [96, 70, 30, 10]];
     inner += `<g transform="${onFaceX(0.04, y2, z2)}">
-      <rect x="5" y="5" width="${w - 10}" height="${h - 24}" fill="#efe9d9"/>
-      <rect x="8" y="8" width="38" height="30" fill="#f6d77b"/><rect x="50" y="8" width="30" height="22" fill="#f6d77b"/>
-      <rect x="84" y="8" width="${w - 92}" height="40" fill="#c9b6ef"/>
-      <rect x="8" y="42" width="30" height="${h - 64}" fill="#9fd89a"/>
-      <rect x="42" y="42" width="46" height="26" fill="#f2a3a3"/><rect x="92" y="52" width="${w - 100}" height="${h - 74}" fill="#f6d77b"/>
-      <rect x="42" y="72" width="46" height="${h - 94}" fill="#f2a3a3" opacity=".75"/>
-      <path d="M5 ${h - 40} C 40 ${h - 60}, 70 ${h - 20}, ${w - 5} ${h - 50}" stroke="#6fb3e8" stroke-width="5" fill="none"/>
-      <path d="M12 20 L60 50 L${w - 20} 60" stroke="${col}" stroke-width="3" fill="none"/>
-      <path d="M40 ${h - 26} L65 30 L80 10" stroke="#e05d5d" stroke-width="3" fill="none"/>
-      ${[[12, 20], [60, 50], [w - 20, 60], [65, 30]].map(([cx, cy]) => `<circle cx="${cx}" cy="${cy}" r="3.2" fill="#fff" stroke="#333" stroke-width="1.2"/>`).join("")}
-      <text x="8" y="${h - 9}" class="map-text">ZONING · LAND USE</text>
-      <path d="M${w - 14} ${h - 20} l5 12 l-5 -3 l-5 3 Z" fill="#333"/>
+      <rect x="5" y="5" width="${w - 10}" height="${h - 24}" fill="#efebe1"/>
+      ${blocks.map(([bx, by, bw, bh]) => `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="#b9b6b0"/>`).join("")}
+      <path d="M7 28 H${w - 8} M7 62 H${w - 8} M33 7 V${h - 22} M90 7 V${h - 22}" stroke="#2bb673" stroke-width="2.6" fill="none"/>
+      <path d="M7 28 C 30 40, 50 52, 90 62" stroke="#f2c230" stroke-width="2.6" fill="none"/>
+      <path d="M90 62 L130 48 M58 62 L58 84" stroke="#e5484d" stroke-width="2.6" fill="none"/>
+      <path class="route" d="M33 7 V28 H90 V62" stroke="#ffffff" stroke-width="1" fill="none" opacity=".9"/>
+      <circle cx="58" cy="84" r="3" fill="#e5484d"/><circle cx="130" cy="48" r="3" fill="#e5484d"/>
+      <rect x="8" y="${h - 17}" width="5" height="5" fill="#2bb673"/><rect x="15" y="${h - 17}" width="5" height="5" fill="#f2c230"/><rect x="22" y="${h - 17}" width="5" height="5" fill="#e5484d"/>
+      <text x="32" y="${h - 12}" class="map-text">PATHWAY INTEGRATION</text>
     </g>`;
     s += obj("map", inner, P(0, (y1 + y2) / 2, z2 + 0.4));
   }
 
-  // ── Transit shelf on the left wall (slot: transit) ────────
+  // ── Shelf with an accessible tiny-house model (slot: house) ─
   {
-    const col = colorOf("transit", "#e05d5d");
-    let inner = box(0, 6.4, 3.7, 0.75, 2.9, 0.12, "#a77650");
-    inner += box(0.1, 6.65, 3.82, 0.5, 1.9, 0.48, col);
-    inner += `<g transform="${onFaceX(0.61, 8.55, 4.24)}">` +
-      Array.from({ length: 5 }, (_, i) => `<rect x="${4 + i * 12.5}" y="2" width="9" height="7" rx="1" fill="#dff3ff"/>`).join("") +
-      `<rect x="0" y="12" width="${1.9 * S}" height="2" fill="${light(col, 0.5)}"/></g>`;
-    inner += box(0.15, 6.55, 3.82, 0.4, 2.1, 0.03, "#5c5f6e"); // rail
+    const col = colorOf("house", "#5b8def");
+    let inner = box(0, 6.4, 3.7, 0.85, 2.9, 0.12, "#a77650");
+    const Zs = 3.82, hx = 0.15, hy = 6.75, hw = 0.55, hd = 1.3, hh = 0.55;
+    inner += box(hx, hy, Zs, hw, hd, hh, "#f3efe6");
+    // gable roof (ridge runs along y)
+    const r = Zs + hh, peak = r + 0.38, mx = hx + hw / 2;
+    inner += poly([P(hx + hw + 0.06, hy - 0.06, r), P(hx + hw + 0.06, hy + hd + 0.06, r), P(mx, hy + hd + 0.06, peak), P(mx, hy - 0.06, peak)], dark(col, 0.05));
+    inner += poly([P(hx - 0.06, hy + hd + 0.06, r), P(hx + hw + 0.06, hy + hd + 0.06, r), P(mx, hy + hd + 0.06, peak)], light(col, 0.2));
+    // door + window on the front (x = hx + hw) face, and a ramp up to the door
+    inner += `<g transform="${onFaceX(hx + hw + 0.005, hy + hd, r)}"><rect x="8" y="5" width="9" height="${hh * S - 5}" fill="${col}"/><rect x="26" y="5" width="11" height="8" fill="#bfe3ff"/></g>`;
+    inner += poly([P(hx + hw, hy + hd - 0.55, Zs), P(hx + hw, hy + hd - 0.25, Zs), P(hx + hw + 0.32, hy + hd - 0.25 + 0.6, Zs), P(hx + hw + 0.32, hy + hd - 0.55 + 0.6, Zs)], "#d9d4c8");
     // hard hat
-    const [hx, hy] = P(0.38, 8.95, 3.82);
-    inner += `<ellipse cx="${hx}" cy="${hy}" rx="15" ry="6" fill="#f5c518"/><path d="M${hx - 11} ${hy - 1} a11 11 0 0 1 22 0 Z" fill="#ffd84a"/>`;
-    s += obj("transit", inner, P(0.35, 7.6, 5.0));
+    const [kx, ky] = P(0.4, 8.95, Zs);
+    inner += `<ellipse cx="${kx}" cy="${ky}" rx="15" ry="6" fill="#f5c518"/><path d="M${kx - 11} ${ky - 1} a11 11 0 0 1 22 0 Z" fill="#ffd84a"/>`;
+    s += obj("house", inner, P(0.4, 7.4, 5.15));
   }
 
   // ── Window with skyline on the right wall ─────────────────
@@ -194,22 +195,24 @@
     </g>`;
   }
 
-  // GIS monitor (slot: gis): animated map with layers + heatmap
+  // Monitor with a SketchUp-style street render (slot: monitor)
   {
     const x = 2.3, y = 0.4, w = 2.8, d = 0.45, z = TOP + 0.5, h = 1.9;
-    const col = colorOf("gis", "#50c878");
     let inner = box(3.45, 0.5, TOP, 0.5, 0.3, 0.5, "#2f313d") + box(3.1, 0.35, TOP, 1.2, 0.7, 0.06, "#2f313d");
     inner += box(x, y, z, w, d, h, "#2b2d38");
     const sw = (w - 0.24) * S, sh = (h - 0.24) * S;
     inner += `<g transform="${onFaceY(x + 0.12, y + d + 0.01, z + h - 0.12)}">
-      <rect width="${sw}" height="${sh}" rx="2" fill="#1d2a33"/>
-      <rect x="0" y="0" width="22" height="${sh}" fill="#26343f"/>
-      ${[0, 1, 2, 3].map((i) => `<rect x="4" y="${6 + i * 9}" width="5" height="5" fill="${["#f6d77b", "#f2a3a3", col, "#6fb3e8"][i]}"/><rect x="11" y="${7 + i * 9}" width="8" height="2" fill="#7d8a96"/>`).join("")}
-      ${Array.from({ length: 5 }, (_, r) => Array.from({ length: 6 }, (_, c) => `<rect x="${26 + c * 10.5}" y="${4 + r * 10.5}" width="8.5" height="8.5" fill="${(r * 7 + c * 3) % 5 === 0 ? col : (r + c) % 3 ? "#3b4b57" : "#4a5d6b"}"/>`).join("")).join("")}
-      <circle class="heat" cx="${26 + 35}" cy="${4 + 26}" r="22" fill="url(#heat)"/>
-      <path class="route" d="M28 50 L50 50 L50 18 L86 18" stroke="${col}" stroke-width="2.4" fill="none"/>
+      <rect width="${sw}" height="${sh}" rx="2" fill="#dfeefa"/>
+      <rect x="0" y="0" width="${sw}" height="6" fill="#3b3d4a"/><circle cx="4" cy="3" r="1.3" fill="#e5484d"/><circle cx="8" cy="3" r="1.3" fill="#f2c230"/>
+      <path d="M${sw * 0.18} ${sh * 0.72} V${sh * 0.42} A${sw * 0.32} ${sh * 0.36} 0 0 1 ${sw * 0.82} ${sh * 0.42} V${sh * 0.72} Z" fill="#e8dcc6"/>
+      ${[0.36, 0.45, 0.55, 0.64].map((f) => `<rect x="${sw * f - 2}" y="${sh * 0.36}" width="4" height="${sh * 0.3}" fill="#9fb7c9"/>`).join("")}
+      <rect x="0" y="${sh * 0.72}" width="${sw}" height="${sh * 0.28}" fill="#8b8f99"/>
+      <rect x="0" y="${sh * 0.72}" width="${sw}" height="3" fill="#6fbf4a"/>
+      ${[0.3, 0.42, 0.54, 0.66].map((f) => `<rect x="${sw * f}" y="${sh * 0.85}" width="7" height="3" fill="#f2d231"/>`).join("")}
+      <rect x="${sw * 0.12}" y="${sh * 0.6}" width="2" height="9" fill="#333"/><circle cx="${sw * 0.12 + 1}" cy="${sh * 0.59}" r="2" fill="#333"/>
+      <rect x="${sw * 0.86}" y="${sh * 0.62}" width="2" height="8" fill="#333"/><circle cx="${sw * 0.86 + 1}" cy="${sh * 0.61}" r="2" fill="#333"/>
     </g>`;
-    s += obj("gis", inner, P(x + w / 2, y + d / 2, z + h + 0.7));
+    s += obj("monitor", inner, P(x + w / 2, y + d / 2, z + h + 0.7));
   }
 
   // Plan sheet with scale ruler + coffee (decor)
@@ -233,34 +236,32 @@
   s += box(2.6, 3.3, 1.4, 1.2, 1.1, 0.2, "#4b5263");
   s += box(2.6, 4.25, 1.6, 1.2, 0.16, 1.5, "#5a6275");
 
-  // ── City model table (slot: model) ────────────────────────
+  // ── 3D campus figure-ground model table (slot: model) ──────
+  // Built from the same grid as the full 3D viewer (assets/campus3d.js).
   {
     const tx = 4.2, ty = 4.2, tw = 4.6, td = 3.6, tz = 1.6;
-    const col = colorOf("model", "#ff7d41");
     let inner = box(tx + 0.1, ty + 0.1, 0, 0.2, 0.2, tz, "#5a4030") + box(tx + tw - 0.3, ty + 0.1, 0, 0.2, 0.2, tz, "#5a4030");
     inner += box(tx + 0.1, ty + td - 0.3, 0, 0.2, 0.2, tz, "#6b4b37") + box(tx + tw - 0.3, ty + td - 0.3, 0, 0.2, 0.2, tz, "#6b4b37");
     inner += box(tx, ty, tz, tw, td, 0.18, "#4a4d5c");
     const Z0 = tz + 0.18;
-    inner += flat(tx + 0.15, ty + 0.15, Z0 + 0.01, tw - 0.3, td - 0.3, "#d9dccf");
-    // roads + river + park
-    inner += flat(tx + 0.15, ty + 1.55, Z0 + 0.02, tw - 0.3, 0.35, "#6b6f7d");
-    inner += flat(tx + 2.25, ty + 0.15, Z0 + 0.02, 0.35, td - 0.3, "#6b6f7d");
-    inner += `<g transform="${onTop(tx + 0.15, ty + 1.715, Z0 + 0.025)}"><path d="M0 0 H${(tw - 0.3) * S}" stroke="#f5e9a8" stroke-width="1" stroke-dasharray="4 4"/></g>`;
-    inner += flat(tx + 0.25, ty + 2.05, Z0 + 0.02, 1.9, 1.3, "#8fcf86");
-    inner += flat(tx + 3.45, ty + 2.05, Z0 + 0.02, 0.95, 1.35, "#7cbfe8");
-    // buildings, sorted back-to-front
-    const B = [
-      [tx + 0.3, ty + 0.3, 0.8, 0.55, 0.8, "#ece6da"], [tx + 1.2, ty + 0.3, 0.85, 0.55, 1.5, "#d7cdbd"],
-      [tx + 0.3, ty + 0.95, 0.8, 0.45, 0.5, "#f2c48d"], [tx + 1.2, ty + 0.95, 0.85, 0.45, 0.7, "#ece6da"],
-      [tx + 2.75, ty + 0.3, 0.6, 0.6, 2.3, col], [tx + 3.5, ty + 0.3, 0.9, 0.55, 0.9, "#c7b8e8"],
-      [tx + 2.75, ty + 1.0, 1.65, 0.4, 0.45, "#ece6da"],
-      [tx + 2.75, ty + 2.05, 0.6, 0.6, 0.65, "#9cc0e6"], [tx + 2.75, ty + 2.75, 0.6, 0.6, 1.0, "#f2c48d"],
-    ].sort((a, b) => a[0] + a[1] - (b[0] + b[1]));
-    B.forEach(([bx, by, bw, bd, bh, bc]) => (inner += box(bx, by, Z0 + 0.02, bw, bd, bh, bc)));
-    // park trees + tram on the road
-    [[0.55, 2.4], [1.1, 2.3], [1.7, 2.5], [0.7, 3.0], [1.4, 3.05], [1.95, 2.95]].forEach(([dx, dy]) => (inner += tree(tx + dx, ty + dy, Z0 + 0.02, 7, "#4f9d55")));
-    inner += `<g class="tram">${box(tx + 0.4, ty + 1.62, Z0 + 0.03, 0.9, 0.22, 0.2, "#e05d5d")}</g>`;
-    s += obj("model", inner, P(tx + 3.05, ty + 0.6, Z0 + 3.0));
+    inner += flat(tx + 0.12, ty + 0.12, Z0 + 0.01, tw - 0.24, td - 0.24, "#f7f6f2");
+    const C3 = window.CAMPUS3D;
+    if (C3) {
+      const hts = Uint8Array.from(atob(C3.heights), (c) => c.charCodeAt(0));
+      const F = 6, gw = Math.floor(C3.w / F), gh = Math.floor(C3.h / F);
+      const cw = (tw - 0.4) / gw, cd = Math.min((td - 0.4) / gh, cw);
+      const ox = tx + 0.2, oy = ty + (td - gh * cd) / 2;
+      const cells = [];
+      for (let gy = 0; gy < gh; gy++) for (let gx = 0; gx < gw; gx++) {
+        let m = 0, n = 0;
+        for (let yy = 0; yy < F; yy++) for (let xx = 0; xx < F; xx++) { const v = hts[(gy * F + yy) * C3.w + gx * F + xx]; if (v) { n++; m = Math.max(m, v); } }
+        if (n > F * F * 0.4) cells.push([gx, gy, m]);
+      }
+      // painter's order: back (small x+y) to front
+      cells.sort((a, b) => a[0] + a[1] - (b[0] + b[1]));
+      cells.forEach(([gx, gy, m]) => (inner += box(ox + gx * cw, oy + gy * cd, Z0 + 0.02, cw, cd, 0.05 + (m / 255) * 0.38, "#77706d")));
+    }
+    s += obj("model", inner, P(tx + tw / 2, ty + td / 2, Z0 + 2.4));
   }
 
   // ── Street tree in a planter (slot: tree) ─────────────────
@@ -279,10 +280,28 @@
 
   // ── Traffic cone (decor) ──────────────────────────────────
   {
-    s += box(8.9, 8.7, 0, 0.7, 0.7, 0.06, "#ff7d41");
-    const [cx, cy] = P(9.25, 9.05, 0.06);
-    s += `<path d="M${cx - 10} ${cy} L${cx - 2} ${cy - 38} L${cx + 2} ${cy - 38} L${cx + 10} ${cy} Z" fill="#ff7d41"/>
-      <path d="M${cx - 6.5} ${cy - 14} L${cx + 6.5} ${cy - 14} L${cx + 5} ${cy - 22} L${cx - 5} ${cy - 22} Z" fill="#fff"/>`;
+    s += box(3.0, 8.7, 0, 0.6, 0.6, 0.05, "#ff7d41");
+    const [cx, cy] = P(3.3, 9.0, 0.05);
+    s += `<path d="M${cx - 9} ${cy} L${cx - 2} ${cy - 34} L${cx + 2} ${cy - 34} L${cx + 9} ${cy} Z" fill="#ff7d41"/>
+      <path d="M${cx - 6} ${cy - 12} L${cx + 6} ${cy - 12} L${cx + 4.5} ${cy - 20} L${cx - 4.5} ${cy - 20} Z" fill="#fff"/>`;
+  }
+
+  // ── BLINK "Future City" light sculpture (slot: blink) ──────
+  // Stacked recycled-cardboard towers with LED windows that cycle colour.
+  {
+    const towers = [[8.55, 8.35, 0.55, 0.55, 1.5], [9.15, 8.35, 0.5, 0.5, 2.2], [8.55, 8.95, 0.5, 0.5, 1.0], [9.1, 8.9, 0.55, 0.6, 1.35]];
+    let inner = box(8.4, 8.2, 0, 1.45, 1.45, 0.12, "#8a6a4a");
+    towers.sort((a, b) => a[0] + a[1] - (b[0] + b[1])).forEach(([x, y, w, d, h], ti) => {
+      inner += box(x, y, 0.12, w, d, h, "#c99a63");
+      const rows = Math.floor(h / 0.3);
+      inner += `<g transform="${onFaceX(x + w + 0.005, y + d, 0.12 + h - 0.08)}">` +
+        Array.from({ length: rows }, (_, r) => [0, 1].map((c) => `<rect class="led" x="${3 + c * 8}" y="${3 + r * 10}" width="5" height="5" style="animation-delay:${(ti * 3 + r + c) * 0.37}s"/>`).join("")).join("") + `</g>`;
+      inner += `<g transform="${onFaceY(x, y + d + 0.005, 0.12 + h - 0.08)}">` +
+        Array.from({ length: rows }, (_, r) => [0, 1].map((c) => `<rect class="led" x="${3 + c * 8}" y="${3 + r * 10}" width="5" height="5" style="animation-delay:${(ti * 5 + r * 2 + c) * 0.29}s"/>`).join("")).join("") + `</g>`;
+    });
+    const [gx, gy] = P(9.1, 8.9, 1.2);
+    inner += `<circle class="blink-glow" cx="${gx}" cy="${gy}" r="70"/>`;
+    s += obj("blink", inner, P(9.1, 8.9, 3.3));
   }
 
   // ── Lighting overlays ─────────────────────────────────────
