@@ -1,8 +1,8 @@
 /* Palette: soft charcoal base (not pitch black), warm orange accent,
    cool blue + green secondaries. Light theme via the ◐ toggle. */
 :root {
-  --bg: #1a1b23;
-  --bg-2: #22232d;
+  --bg: #1c1e1d;
+  --bg-2: #252826;
   --card: rgba(255, 255, 255, 0.045);
   --card-2: rgba(255, 255, 255, 0.07);
   --border: rgba(255, 255, 255, 0.1);
@@ -20,11 +20,12 @@
   --display: "Poppins", "Inter", system-ui, sans-serif;
   --sans: "Inter", system-ui, sans-serif;
   /* room palette: warm dusk, not pitch black */
-  --wall-l: #5d5774; --wall-r: #4e4964; --wall-cap: #77708f;
-  --base-l: #4a4560; --base-r: #403b55;
-  --floor: #9a6c49; --plank: rgba(0, 0, 0, 0.12);
+  /* evening studio: sage walls, warm wood, dusk sky */
+  --wall-l: #56635c; --wall-r: #4a564f; --wall-cap: #6f7d75;
+  --base-l: #434e48; --base-r: #3b453f;
+  --floor: #a2724c; --plank: rgba(0, 0, 0, 0.1);
   --slab-l: #5e4230; --slab-r: #4c3526;
-  --sky-1: #26305e; --sky-2: #c9757a; --moon: #fff3d1; --skyline: #2b2944; --dim: rgba(15, 12, 35, 0.12);
+  --sky-1: #1f3550; --sky-2: #e3a07a; --moon: #fff3d1; --skyline: #2a3a45; --dim: rgba(10, 14, 12, 0.06);
   color-scheme: dark;
 }
 :root[data-theme="light"] {
@@ -171,7 +172,7 @@ h2.spaced { text-transform: uppercase; letter-spacing: .28em; font-size: clamp(1
   overflow: hidden; text-overflow: ellipsis;
   transform: translate(-50%, -130%) scale(.96); opacity: 0; transition: opacity .18s, transform .18s;
   font-size: .72rem; letter-spacing: .08em; padding: 8px 14px; border-radius: 999px;
-  color: #f5efe6; background: rgba(22, 20, 30, 0.88); border: 1px solid var(--c);
+  color: #f5efe6; background: rgba(24, 27, 25, 0.9); border: 1px solid var(--c);
   box-shadow: 0 0 22px color-mix(in srgb, var(--c) 35%, transparent);
 }
 .room-label.on { opacity: 1; transform: translate(-50%, -130%) scale(1); }
@@ -221,7 +222,7 @@ h2.spaced { text-transform: uppercase; letter-spacing: .28em; font-size: clamp(1
 .lamp-glow { pointer-events: none; mix-blend-mode: screen; transition: opacity .4s; }
 .dim-overlay { pointer-events: none; fill: var(--dim); transition: fill .4s; }
 #room.lamp-off .lamp-glow, #room.lamp-off .bulb { opacity: 0; }
-#room.lamp-off .dim-overlay { fill: rgba(15, 12, 35, 0.3); }
+#room.lamp-off .dim-overlay { fill: rgba(10, 14, 12, 0.3); }
 :root[data-theme="light"] .lamp-glow { opacity: .35; }
 
 @media (max-width: 960px) {
@@ -315,6 +316,7 @@ h2.spaced { text-transform: uppercase; letter-spacing: .28em; font-size: clamp(1
   border: 1px solid color-mix(in srgb, var(--c) 22%, var(--border));
   transition: transform .15s ease-out, border-color .3s, box-shadow .3s;
   text-align: left; color: inherit; font: inherit; width: 100%;
+  display: flex; flex-direction: column; justify-content: flex-start;
 }
 .card::before {
   content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .3s;
@@ -328,7 +330,9 @@ h2.spaced { text-transform: uppercase; letter-spacing: .28em; font-size: clamp(1
 .card.hide { display: none; }
 .card-label { display: flex; align-items: center; gap: 10px; font: 500 .75rem var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--c); margin-bottom: 16px; }
 .card-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); box-shadow: 0 0 16px var(--c); }
-.card-label .yr { margin-left: auto; color: var(--muted); letter-spacing: 0; }
+.card-label .yr { margin-left: auto; color: var(--muted); letter-spacing: 0; white-space: nowrap; }
+.card-label { flex-wrap: wrap; row-gap: 4px; }
+.card p { flex: 0 0 auto; }
 .card h3 { margin: 0 0 10px; font: 600 1.3rem/1.25 var(--display); letter-spacing: -0.01em; }
 .card-cover { margin: -30px -30px 22px; height: 180px; overflow: hidden; border-bottom: 1px solid var(--border); background: color-mix(in srgb, var(--c) 14%, var(--bg-2)); }
 .card-cover img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.2,.8,.2,1); }
@@ -338,7 +342,7 @@ h2.spaced { text-transform: uppercase; letter-spacing: .28em; font-size: clamp(1
 .card p { margin: 0 0 20px; color: var(--text-2); font-size: .95rem; }
 .stack { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 0; }
 .stack li { font: .72rem var(--mono); padding: 3px 9px; border-radius: 6px; color: var(--c); background: color-mix(in srgb, var(--c) 10%, transparent); border: 1px solid color-mix(in srgb, var(--c) 22%, transparent); }
-.card-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); font-size: .88rem; color: var(--c); }
+.card-foot { margin-top: auto !important; display: flex; justify-content: space-between; align-items: center; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); font-size: .88rem; color: var(--c); }
 .card-foot .arrow { transition: transform .3s; }
 .card:hover .card-foot .arrow { transform: translate(3px, -3px); }
 
