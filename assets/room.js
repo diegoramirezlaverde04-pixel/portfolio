@@ -268,33 +268,51 @@
   s += box(2.6, 3.3, 1.4, 1.15, 1.05, 0.12, WHITE);
   s += box(2.6, 4.25, 1.52, 1.15, 0.1, 1.25, WHITE);
 
-  // ── 3D campus figure-ground model table (slot: model) ──────
-  // Built from the same grid as the full 3D viewer (assets/campus3d.js).
+  // ── UC campus model table (slot: model) ───────────────────
+  // Footprints + streets from the AutoCAD figure-ground map (assets/campus3d.js
+  // and the same map printed on the base), the same data as the 3D viewer.
   {
-    const tx = 4.2, ty = 4.2, tw = 4.6, td = 3.6, tz = 1.65;
+    const tx = 4.1, ty = 4.1, tw = 4.8, td = 3.8, tz = 1.65;
     let inner = box(tx + 0.15, ty + 0.15, 0, 0.07, 0.07, tz, INK) + box(tx + tw - 0.22, ty + 0.15, 0, 0.07, 0.07, tz, INK);
     inner += box(tx + 0.15, ty + td - 0.22, 0, 0.07, 0.07, tz, INK) + box(tx + tw - 0.22, ty + td - 0.22, 0, 0.07, 0.07, tz, INK);
     inner += box(tx, ty, tz, tw, td, 0.1, WHITE);
     const Z0 = tz + 0.1;
-    inner += flat(tx + 0.15, ty + 0.15, Z0 + 0.005, tw - 0.3, td - 0.3, "#ffffff");
     const C3 = window.CAMPUS3D;
     if (C3) {
       const hts = Uint8Array.from(atob(C3.heights), (c) => c.charCodeAt(0));
-      const F = 6, gw = Math.floor(C3.w / F), gh = Math.floor(C3.h / F);
-      const cw = (tw - 0.4) / gw, cd = Math.min((td - 0.4) / gh, cw);
-      const ox = tx + 0.2, oy = ty + (td - gh * cd) / 2;
-      const cells = [];
+      const F = 4, gw = Math.floor(C3.w / F), gh = Math.floor(C3.h / F);
+      const cw = Math.min((tw - 0.3) / gw, (td - 0.3) / gh);
+      const mw = gw * cw, md = gh * cw;
+      const ox = tx + (tw - mw) / 2, oy = ty + (td - md) / 2;
+      // base plate with the printed map (streets and paths)
+      inner += box(ox - 0.04, oy - 0.04, Z0, mw + 0.08, md + 0.08, 0.04, "#fbfaf7");
+      const Zb = Z0 + 0.041;
+      inner += `<g transform="${onTop(ox, oy, Zb)}"><image href="assets/img/campus-figure-ground.jpg" width="${mw * S}" height="${md * S}" preserveAspectRatio="none" opacity=".55"/></g>`;
+      const cells = [], empty = [];
       for (let gy = 0; gy < gh; gy++) for (let gx = 0; gx < gw; gx++) {
         let m = 0, n = 0;
         for (let yy = 0; yy < F; yy++) for (let xx = 0; xx < F; xx++) { const v = hts[(gy * F + yy) * C3.w + gx * F + xx]; if (v) { n++; m = Math.max(m, v); } }
-        if (n > F * F * 0.4) cells.push([gx, gy, m]);
+        if (n > F * F * 0.45) cells.push([gx, gy, m]);
+        else if (!n) empty.push([gx, gy]);
       }
-      // painter's order: back (small x+y) to front
-      cells.sort((a, b) => a[0] + a[1] - (b[0] + b[1]));
-      cells.forEach(([gx, gy, m]) => (inner += box(ox + gx * cw, oy + gy * cd, Z0 + 0.01, cw, cd, 0.05 + (m / 255) * 0.38, "#9a948f")));
+      // a few street trees in open space (deterministic)
+      const occupied = new Set(cells.map(([x, y]) => x + "," + y));
+      const trees = empty.filter(([x, y], i) => (x * 7 + y * 13) % 23 === 0 && !occupied.has(x + 1 + "," + y) && !occupied.has(x + "," + (y + 1)) && !occupied.has(x - 1 + "," + y) && !occupied.has(x + "," + (y - 1)));
+      const items = cells.map((c) => ["b", ...c]).concat(trees.map(([x, y]) => ["t", x, y]));
+      items.sort((p, q) => p[1] + p[2] - (q[1] + q[2]));
+      items.forEach(([k, gx, gy, m]) => {
+        const x = ox + gx * cw, y = oy + gy * cw;
+        if (k === "b") inner += box(x, y, Zb, cw, cw, 0.04 + (m / 255) * 0.42, "#d3cec6");
+        else { const [px, py] = P(x + cw / 2, y + cw / 2, Zb); inner += `<circle cx="${px}" cy="${py - 3}" r="2.6" fill="#5fae6e"/>`; }
+      });
+      // north arrow
+      const [nx, ny] = P(ox + mw - 0.18, oy + 0.2, Zb);
+      inner += `<path d="M${nx} ${ny - 9} l3.5 8 l-3.5 -2 l-3.5 2 Z" fill="${INK}"/>`;
     }
-    // scale figure standing at the model's front corner
-    const [px, py] = P(tx + tw - 0.35, ty + td - 0.35, Z0);
+    // plaque on the table's front edge
+    inner += `<g transform="${onFaceY(tx + 0.5, ty + td + 0.002, tz + 0.09)}"><rect width="${1.5 * S}" height="${0.08 * S}" fill="${INK}"/><text x="${0.75 * S}" y="${0.08 * S - 0.6}" text-anchor="middle" class="plaque-text">UC CAMPUS · FIGURE-GROUND</text></g>`;
+    // scale figure at the model's front corner
+    const [px, py] = P(tx + tw - 0.3, ty + td - 0.3, Z0);
     inner += `<g class="scale-fig"><circle cx="${px}" cy="${py - 13}" r="2.6" fill="#2bb673"/><rect x="${px - 2}" y="${py - 10.5}" width="4" height="10.5" rx="1.5" fill="#2bb673"/></g>`;
     s += obj("model", inner, P(tx + tw / 2, ty + td / 2, Z0 + 2.4));
   }
@@ -318,22 +336,24 @@
       <path d="M${ax - 12} ${ay + 10} A12 10 0 0 1 ${ax + 12} ${ay + 10} Z" fill="${INK}"/>`;
   }
 
-  // ── BLINK "Future City" light sculpture (slot: blink) ──────
-  // Stacked recycled-cardboard towers with LED windows that cycle colour.
+  // ── BLINK "Future City" leaf sculpture on a stand (slot: blink) ──
+  // Recycled cardboard leaf with LED-lit veins.
   {
-    const towers = [[8.55, 8.35, 0.55, 0.55, 1.5], [9.15, 8.35, 0.5, 0.5, 2.2], [8.55, 8.95, 0.5, 0.5, 1.0], [9.1, 8.9, 0.55, 0.6, 1.35]];
-    let inner = box(8.4, 8.2, 0, 1.45, 1.45, 0.1, INK);
-    towers.sort((a, b) => a[0] + a[1] - (b[0] + b[1])).forEach(([x, y, w, d, h], ti) => {
-      inner += box(x, y, 0.1, w, d, h, "#c99a63");
-      const rows = Math.floor(h / 0.3);
-      inner += `<g transform="${onFaceX(x + w + 0.005, y + d, 0.1 + h - 0.08)}">` +
-        Array.from({ length: rows }, (_, r) => [0, 1].map((c) => `<rect class="led" x="${3 + c * 8}" y="${3 + r * 10}" width="5" height="5" style="animation-delay:${(ti * 3 + r + c) * 0.37}s"/>`).join("")).join("") + `</g>`;
-      inner += `<g transform="${onFaceY(x, y + d + 0.005, 0.1 + h - 0.08)}">` +
-        Array.from({ length: rows }, (_, r) => [0, 1].map((c) => `<rect class="led" x="${3 + c * 8}" y="${3 + r * 10}" width="5" height="5" style="animation-delay:${(ti * 5 + r * 2 + c) * 0.29}s"/>`).join("")).join("") + `</g>`;
-    });
-    const [gx, gy] = P(9.1, 8.9, 1.2);
-    inner += `<circle class="blink-glow" cx="${gx}" cy="${gy}" r="70"/>`;
-    s += obj("blink", inner, P(9.1, 8.9, 3.3));
+    const cx = 9.05, cy = 2.75;
+    const [fx, fy] = P(cx, cy, 0);
+    const sx = fx, sy = fy - 70;                 // where the stem meets the leaf
+    let inner = cyl(cx, cy, 0, 0.3, 0.04, INK);
+    inner += `<path d="M${fx} ${fy - 2} V${sy}" stroke="${INK}" stroke-width="2"/>`;
+    // leaf (tip up, slightly tilted)
+    inner += `<g transform="rotate(-14 ${sx} ${sy})">
+      <path d="M${sx} ${sy} C${sx - 40} ${sy - 18} ${sx - 34} ${sy - 74} ${sx} ${sy - 104} C${sx + 34} ${sy - 74} ${sx + 40} ${sy - 18} ${sx} ${sy} Z" fill="#c99a63" stroke="#a87c48" stroke-width="1"/>
+      <path d="M${sx} ${sy} C${sx - 40} ${sy - 18} ${sx - 34} ${sy - 74} ${sx} ${sy - 104} Z" fill="#b5864f"/>
+      <path class="led-vein" d="M${sx} ${sy + 2} V${sy - 100}" stroke-width="2"/>
+      ${[[-22, 18, 8], [22, 18, 8], [-22, 36, 26], [22, 36, 26], [-20, 54, 44], [20, 54, 44], [-14, 72, 62], [14, 72, 62], [-8, 88, 80], [8, 88, 80]]
+        .map(([dx, ey, my], i) => `<path class="led-vein" d="M${sx} ${sy - my} Q${sx + dx * 0.55} ${sy - ey + 4} ${sx + dx} ${sy - ey - 4}" stroke-width="1.3" style="animation-delay:-${(i * 0.27).toFixed(2)}s"/>`).join("")}
+    </g>`;
+    inner += `<circle class="blink-glow" cx="${sx}" cy="${sy - 52}" r="62"/>`;
+    s += obj("blink", inner, [sx - 12, sy - 120]);
   }
 
   // ── Lighting overlays ─────────────────────────────────────

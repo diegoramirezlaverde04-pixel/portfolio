@@ -187,6 +187,7 @@ h2.spaced { text-transform: uppercase; letter-spacing: .28em; font-size: clamp(1
 :root[data-theme="light"] .star, :root[data-theme="light"] .win-light { display: none; }
 .win-light { fill: #ffd98a; animation: twinkle 4s ease-in-out infinite; }
 @keyframes twinkle { 50% { opacity: .25; } }
+.plaque-text { font: 700 2.3px var(--mono); letter-spacing: .12em; fill: #fff; }
 .sign-text { font: 700 9px var(--mono); letter-spacing: .14em; fill: #fff; }
 .window-reflect { fill: rgba(255, 255, 255, 0.08); }
 .map-text { font: 700 7px var(--mono); letter-spacing: .12em; fill: #555; }
@@ -196,6 +197,8 @@ h2.spaced { text-transform: uppercase; letter-spacing: .28em; font-size: clamp(1
 @keyframes route { to { stroke-dashoffset: -20; } }
 .led { animation: led 3.2s linear infinite; }
 @keyframes led { 0% { fill: #ffd76a; } 25% { fill: #ff7ab8; } 50% { fill: #8fd3ff; } 75% { fill: #a6f08a; } 100% { fill: #ffd76a; } }
+.led-vein { fill: none; stroke-linecap: round; animation: vein 3.2s linear infinite; }
+@keyframes vein { 0% { stroke: #ffd76a; } 25% { stroke: #a6f08a; } 50% { stroke: #8fd3ff; } 75% { stroke: #ff9ec9; } 100% { stroke: #ffd76a; } }
 .blink-glow { fill: url(#blinkGlow); pointer-events: none; mix-blend-mode: screen; animation: twinkle 3.2s ease-in-out infinite; }
 :root[data-theme="light"] .blink-glow { mix-blend-mode: multiply; opacity: .5; }
 

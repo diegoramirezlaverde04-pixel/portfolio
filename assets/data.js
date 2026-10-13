@@ -170,9 +170,9 @@ window.PORTFOLIO = {
       room: "blink",
       context: "Student designer · Oct 2024",
       status: "live",
-      summary: "An illuminated wearable sculpture about urban sustainability for BLINK, Cincinnati's light and art festival.",
+      summary: "An illuminated, leaf-shaped wearable sculpture about urban sustainability for BLINK, Cincinnati's light and art festival.",
       description: [
-        "For BLINK, the nation's largest light and art festival, I designed an illuminated wearable sculpture featuring urban sustainability.",
+        "For BLINK, the nation's largest light and art festival, I designed an illuminated, leaf-shaped wearable sculpture featuring urban sustainability.",
         "I engineered and prototyped 15+ pieces from recycled cardboard and LED lighting within a one-week build. The work was featured on the BLINK website, in the Cincinnati Enquirer and on UC DAAP social media, reaching 10K+ viewers.",
       ],
       tags: ["installation", "sustainability"],
