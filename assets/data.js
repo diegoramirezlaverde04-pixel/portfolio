@@ -105,7 +105,7 @@ window.PORTFOLIO = {
       tags: ["accessibility", "gis", "design"],
       stack: ["ArcGIS", "Illustrator", "SketchUp", "Hand sketching"],
       color: "#2bb673",
-      cover: "assets/img/inclusive-cover.jpg",
+      cover: "assets/img/inclusive-map.jpg",
       gallery: [
         { src: "assets/img/inclusive-map.jpg", caption: "Pathway integration map: green = strong, yellow = moderate, red = poor integration", group: "Integration map" },
         { src: "assets/img/inclusive-sketch-linder.jpg", caption: "Sketch: ramp to Lindner Hall (well integrated)", group: "Sketches" },
@@ -178,10 +178,9 @@ window.PORTFOLIO = {
       tags: ["installation", "sustainability"],
       stack: ["Recycled cardboard", "LED lighting", "Prototyping"],
       color: "#e8742c",
-      cover: "assets/img/blink-leaf.jpg",
+      cover: "assets/img/blink-leaf-detail.jpg",
       gallery: [
-        { src: "assets/img/blink-leaf.jpg", caption: "The illuminated leaf sculpture on the Cincinnati riverfront", group: "The piece" },
-        { src: "assets/img/blink-leaf-detail.jpg", caption: "Detail: overlapping translucent panels and LED string lights", group: "The piece" },
+        { src: "assets/img/blink-leaf-detail.jpg", caption: "The illuminated leaf: overlapping translucent panels and LED string lights", group: "The piece" },
       ],
       links: {},
     },
