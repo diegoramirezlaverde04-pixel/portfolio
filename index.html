@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Diego Ramirez Laverde — Portfolio</title>
+  <meta name="description" content="Interactive portfolio of Diego Ramirez Laverde." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/styles.css" />
+  <script>
+    // Apply the saved theme before first paint to avoid a flash.
+    try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <div class="cursor" aria-hidden="true"></div>
+
+  <header class="nav">
+    <a class="logo" href="#top" data-name></a>
+    <nav>
+      <a href="#projects">Projects</a>
+      <a href="#about">About</a>
+      <a href="#terminal">Terminal</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="kbd-btn" id="open-palette" title="Command palette">
+        <span>Search</span> <kbd>⌘K</kbd>
+      </button>
+      <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme">◐</button>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <p class="eyebrow mono">hello, world — I'm</p>
+      <h1 class="hero-name" data-name></h1>
+      <p class="hero-role" data-role></p>
+      <p class="hero-type mono"><span id="typewriter"></span><span class="caret">▍</span></p>
+      <div class="hero-cta">
+        <a class="btn primary magnetic" href="#projects">See my work</a>
+        <a class="btn magnetic" href="#terminal">Open terminal</a>
+      </div>
+      <p class="hint mono">tip: move your mouse, press <kbd>⌘K</kbd>, or type <code>help</code> in the terminal</p>
+    </section>
+
+    <section id="projects" class="section">
+      <div class="section-head reveal">
+        <h2><span class="mono num">01.</span> Projects</h2>
+        <div class="filters" id="filters" role="tablist"></div>
+      </div>
+      <div class="grid" id="project-grid"></div>
+    </section>
+
+    <section id="about" class="section about">
+      <div class="section-head reveal">
+        <h2><span class="mono num">02.</span> About</h2>
+      </div>
+      <div class="about-body reveal">
+        <p id="about-text"></p>
+        <ul class="skills" id="skills"></ul>
+      </div>
+    </section>
+
+    <section id="terminal" class="section">
+      <div class="section-head reveal">
+        <h2><span class="mono num">03.</span> Terminal</h2>
+      </div>
+      <div class="term reveal" id="term">
+        <div class="term-bar">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="term-title mono" id="term-title"></span>
+        </div>
+        <div class="term-body mono" id="term-out" aria-live="polite"></div>
+        <form class="term-input mono" id="term-form" autocomplete="off">
+          <label for="term-in" id="term-prompt"></label>
+          <input id="term-in" spellcheck="false" aria-label="Terminal input" />
+        </form>
+      </div>
+    </section>
+
+    <section id="contact" class="section contact">
+      <div class="reveal">
+        <h2><span class="mono num">04.</span> Let's build something</h2>
+        <p>My inbox is always open — whether it's a project, a role, or just to say hi.</p>
+        <div class="contact-links" id="contact-links"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer mono">
+    <span>© <span id="year"></span> <span data-name></span></span>
+    <span>built from scratch · no frameworks</span>
+  </footer>
+
+  <!-- Project modal -->
+  <dialog id="modal" class="modal">
+    <button class="icon-btn modal-close" id="modal-close" aria-label="Close">✕</button>
+    <div id="modal-content"></div>
+  </dialog>
+
+  <!-- Command palette -->
+  <dialog id="palette" class="palette">
+    <input id="palette-in" placeholder="Type a command or search projects…" autocomplete="off" />
+    <ul id="palette-list" role="listbox"></ul>
+  </dialog>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/main.js"></script>
+</body>
+</html>
