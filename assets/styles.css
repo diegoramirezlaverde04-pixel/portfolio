@@ -24,16 +24,16 @@
   --wall-l: #56635c; --wall-r: #4a564f; --wall-cap: #6f7d75;
   --base-l: #434e48; --base-r: #3b453f;
   --floor: #a2724c; --plank: rgba(0, 0, 0, 0.1);
-  --slab-l: #5e4230; --slab-r: #4c3526;
+  --slab-l: #5e4230; --slab-r: #4c3526; --rug: #3e4742;
   --sky-1: #1f3550; --sky-2: #e3a07a; --moon: #fff3d1; --skyline: #2a3a45; --dim: rgba(10, 14, 12, 0.06);
   color-scheme: dark;
 }
 :root[data-theme="light"] {
-  --wall-l: #ece3d4; --wall-r: #ddd2c0; --wall-cap: #f7f1e6;
-  --base-l: #cfc3ae; --base-r: #c3b6a0;
-  --floor: #c99a6c; --plank: rgba(0, 0, 0, 0.08);
-  --slab-l: #8f6a4b; --slab-r: #7c5a3e;
-  --sky-1: #7cc3f2; --sky-2: #d8efff; --moon: #ffd75e; --skyline: #8aa4bd; --dim: rgba(0, 0, 0, 0);
+  --wall-l: #f6f5f2; --wall-r: #e9e7e2; --wall-cap: #ffffff;
+  --base-l: #d9d6cf; --base-r: #cfccc5;
+  --floor: #dcc29b; --plank: rgba(0, 0, 0, 0.06);
+  --slab-l: #b99d74; --slab-r: #a68a62; --rug: #ecebe7;
+  --sky-1: #8cc9f0; --sky-2: #e4f3fc; --moon: #ffd75e; --skyline: #9db2c4; --dim: rgba(0, 0, 0, 0);
   --bg: #fbfbf9; --bg-2: #ffffff; --card: rgba(0, 0, 0, 0.025); --card-2: rgba(0, 0, 0, 0.045);
   --border: rgba(0, 0, 0, 0.1); --text: #231f20; --text-2: #3d393a; --muted: #6d6a6b;
   --accent: #1f9d63; --accent-deep: #157a4c; --green: #2bb673; --blue: #2f7fd1; --yellow: #e0a800;
@@ -187,6 +187,8 @@ h2.spaced { text-transform: uppercase; letter-spacing: .28em; font-size: clamp(1
 :root[data-theme="light"] .star, :root[data-theme="light"] .win-light { display: none; }
 .win-light { fill: #ffd98a; animation: twinkle 4s ease-in-out infinite; }
 @keyframes twinkle { 50% { opacity: .25; } }
+.sign-text { font: 700 9px var(--mono); letter-spacing: .14em; fill: #fff; }
+.window-reflect { fill: rgba(255, 255, 255, 0.08); }
 .map-text { font: 700 7px var(--mono); letter-spacing: .12em; fill: #555; }
 .steam { stroke: rgba(255, 255, 255, .45); stroke-width: 2; fill: none; stroke-linecap: round; animation: steam 3s ease-in-out infinite; }
 @keyframes steam { 0%, 100% { opacity: 0; transform: translateY(4px); } 50% { opacity: 1; transform: none; } }

@@ -57,8 +57,9 @@ window.PORTFOLIO = {
 
   // Each project becomes a glowing object in the room, a card, a full
   // project view, and a terminal entry.
-  //   room     → object in the room: "model" (3D campus table) | "map" (wall map)
-  //              | "monitor" | "house" (shelf) | "blink" (light sculpture)
+  //   room     → object(s) in the room, one slot or a list: "model" (3D campus table)
+  //              | "pad" (tracing pad on the desk) | "map" (wall map) | "monitor"
+  //              | "house" (shelf) | "blink" (light sculpture)
   //              (also available: "board" | "blueprints" | "tree")
   //   viewer3d → true shows the interactive 3D figure-ground model in the project view
   //   cover   → image shown on the card and at the top of the project view
@@ -93,7 +94,7 @@ window.PORTFOLIO = {
       id: "inclusive-vs-compliant",
       num: "02",
       title: "Inclusive vs. Compliant Pathways",
-      room: "map",
+      room: ["pad", "map"],
       context: "UC DAAP coursework",
       status: "live",
       summary: "Where UC's wheelchair-accessible routes split from the paths most students actually use.",

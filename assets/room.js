@@ -58,10 +58,11 @@
   const onTop = (x, y, z) => { const [ex, ey] = P(x, y, z); return `matrix(${C} ${N} ${-C} ${N} ${ex} ${ey})`; }; // plane z=const
 
   // ── Map projects onto room objects ────────────────────────
-  const SLOTS = ["model", "map", "monitor", "house", "blink", "board", "blueprints", "tree"];
+  const SLOTS = ["model", "pad", "map", "monitor", "house", "blink", "board", "blueprints", "tree"];
   const bySlot = {};
   const free = [...SLOTS];
-  D.projects.forEach((p) => { if (p.room && free.includes(p.room)) { bySlot[p.room] = p; free.splice(free.indexOf(p.room), 1); } });
+  // `room` may be one slot or a list of slots (one project, several objects)
+  D.projects.forEach((p) => [].concat(p.room || []).forEach((r) => { if (free.includes(r)) { bySlot[r] = p; free.splice(free.indexOf(r), 1); } }));
   D.projects.forEach((p) => { if (!Object.values(bySlot).includes(p) && free.length) bySlot[free.shift()] = p; });
   const colorOf = (slot, fallback) => bySlot[slot]?.color || fallback;
 
@@ -70,7 +71,7 @@
   function obj(slot, inner, anchor) {
     const p = bySlot[slot];
     if (!p) return `<g class="obj">${inner}</g>`;
-    anchors[p.id] = anchor;
+    anchors[p.id] ||= anchor; // first object of a project anchors its label
     const [ax, ay] = anchor;
     return `<g class="obj project" data-id="${esc(p.id)}" tabindex="0" role="button" aria-label="${esc(p.title)}: ${esc(p.summary)}" style="--c:${esc(p.color || "#ff7d41")}">
       ${inner}
@@ -87,7 +88,10 @@
     <radialGradient id="blinkGlow"><stop offset="0" stop-color="#d79bff" stop-opacity=".45"/><stop offset="1" stop-color="#d79bff" stop-opacity="0"/></radialGradient>
   </defs>`;
 
-  // ── Shell: floor slab, walls, baseboards ──────────────────
+  // Modern palette: white walls, light oak, matte black details.
+  const INK = "#262626", WHITE = "#f3f2ef", OAK = "#cfae82";
+
+  // ── Shell: floor slab, walls, shadow-gap baseboards ────────
   s += `<g class="shell">`;
   s += poly([P(X, 0, 0), P(X, Y, 0), P(X, Y, -0.45), P(X, 0, -0.45)], "var(--slab-r)");
   s += poly([P(0, Y, 0), P(X, Y, 0), P(X, Y, -0.45), P(0, Y, -0.45)], "var(--slab-l)");
@@ -99,111 +103,121 @@
   s += poly([P(-T, -T, Z), P(X, -T, Z), P(X, 0, Z), P(0, 0, Z)], "var(--wall-cap)");
   s += poly([P(-T, Y, -0.45), P(0, Y, -0.45), P(0, Y, Z), P(-T, Y, Z)], "var(--slab-l)");
   s += poly([P(X, -T, -0.45), P(X, 0, -0.45), P(X, 0, Z), P(X, -T, Z)], "var(--slab-r)");
-  s += poly([P(0, 0, 0), P(0, Y, 0), P(0, Y, 0.3), P(0, 0, 0.3)], "var(--base-l)");
-  s += poly([P(0, 0, 0), P(X, 0, 0), P(X, 0, 0.3), P(0, 0, 0.3)], "var(--base-r)");
+  s += poly([P(0, 0, 0), P(0, Y, 0), P(0, Y, 0.12), P(0, 0, 0.12)], "var(--base-l)");
+  s += poly([P(0, 0, 0), P(X, 0, 0), P(X, 0, 0.12), P(0, 0, 0.12)], "var(--base-r)");
   s += `</g>`;
 
-  // ── Pathway-integration map on the left wall (slot: map) ─
+  // ── Floor-to-ceiling window on the right wall ─────────────
   {
-    const y1 = 1.2, y2 = 5.8, z1 = 2.9, z2 = 6.2, w = (y2 - y1) * S, h = (z2 - z1) * S;
-    let inner = poly([P(0.03, y1, z1), P(0.03, y2, z1), P(0.03, y2, z2), P(0.03, y1, z2)], "#f7f4ec");
-    const blocks = [[10, 10, 22, 14], [36, 8, 16, 20], [58, 12, 26, 12], [92, 8, 18, 26], [118, 14, 14, 18], [12, 32, 14, 24], [40, 40, 30, 20], [76, 36, 12, 30], [100, 48, 24, 14], [20, 66, 26, 12], [60, 70, 18, 10], [96, 70, 30, 10]];
+    const x1 = 5.5, x2 = 9.6, z1 = 0.12, z2 = 6.6, w = (x2 - x1) * S, h = (z2 - z1) * S;
+    s += `<g class="window">`;
+    s += poly([P(x1 - 0.08, 0, z1), P(x2 + 0.08, 0, z1), P(x2 + 0.08, 0, z2 + 0.08), P(x1 - 0.08, 0, z2 + 0.08)], INK);
+    s += poly([P(x1, 0, z1), P(x2, 0, z1), P(x2, 0, z2), P(x1, 0, z2)], "url(#sky)");
+    s += `<g transform="${onFaceY(x1, 0, z2)}">`;
+    const stars = [[14, 14], [40, 26], [70, 10], [96, 34], [26, 44], [118, 16], [58, 38]];
+    s += stars.map(([sx, sy], i) => `<circle class="star" cx="${sx}" cy="${sy}" r="${i % 3 ? 1 : 1.5}" style="animation-delay:${i * 0.4}s"/>`).join("");
+    s += `<circle class="moon" cx="${w * 0.72}" cy="${h * 0.16}" r="10"/>`;
+    const g = h * 0.62;
+    s += `<path class="skyline" d="M0 ${h} V${g - 10} h12 v-22 h10 v30 h9 v-46 h5 v-8 h5 v8 h5 v46 h12 v-20 h14 v-12 h10 v38 h9 v-54 h14 v58 h12 v-26 h12 V${h} Z"/>`;
+    s += [[16, g - 24], [38, g - 40], [38, g - 28], [80, g - 18], [104, g - 52], [108, g - 38], [124, g - 20]]
+      .map(([wx, wy], i) => `<rect class="win-light" x="${wx}" y="${wy}" width="2.5" height="2.5" style="animation-delay:${i * 0.7}s"/>`).join("");
+    s += `<rect x="0" y="${h * 0.62}" width="${w}" height="${h * 0.38}" class="window-reflect"/>`;
+    s += [w / 3, (2 * w) / 3].map((mx) => `<rect x="${mx - 1.2}" y="0" width="2.4" height="${h}" fill="${INK}"/>`).join("");
+    s += `<rect x="0" y="${h * 0.62 - 1.2}" width="${w}" height="2.4" fill="${INK}"/>`;
+    s += `</g></g>`;
+  }
+
+  // ── Framed pathway-integration map on the left wall (slot: map)
+  {
+    const y1 = 1.2, y2 = 5.8, z1 = 3.0, z2 = 6.2, w = (y2 - y1) * S, h = (z2 - z1) * S;
+    let inner = poly([P(0.02, y1 - 0.06, z1 - 0.06), P(0.02, y2 + 0.06, z1 - 0.06), P(0.02, y2 + 0.06, z2 + 0.06), P(0.02, y1 - 0.06, z2 + 0.06)], INK);
+    inner += poly([P(0.03, y1, z1), P(0.03, y2, z1), P(0.03, y2, z2), P(0.03, y1, z2)], "#fbfaf7");
+    const blocks = [[14, 12, 22, 14], [40, 10, 16, 20], [62, 14, 26, 12], [96, 10, 18, 26], [120, 16, 14, 18], [16, 34, 14, 22], [44, 40, 30, 18], [80, 36, 12, 28], [104, 48, 22, 14], [24, 64, 26, 10], [64, 68, 18, 8], [100, 68, 28, 8]];
     inner += `<g transform="${onFaceX(0.04, y2, z2)}">
-      <rect x="5" y="5" width="${w - 10}" height="${h - 24}" fill="#efebe1"/>
-      ${blocks.map(([bx, by, bw, bh]) => `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="#b9b6b0"/>`).join("")}
-      <path d="M7 28 H${w - 8} M7 62 H${w - 8} M33 7 V${h - 22} M90 7 V${h - 22}" stroke="#2bb673" stroke-width="2.6" fill="none"/>
-      <path d="M7 28 C 30 40, 50 52, 90 62" stroke="#f2c230" stroke-width="2.6" fill="none"/>
-      <path d="M90 62 L130 48 M58 62 L58 84" stroke="#e5484d" stroke-width="2.6" fill="none"/>
-      <path class="route" d="M33 7 V28 H90 V62" stroke="#ffffff" stroke-width="1" fill="none" opacity=".9"/>
-      <circle cx="58" cy="84" r="3" fill="#e5484d"/><circle cx="130" cy="48" r="3" fill="#e5484d"/>
-      <rect x="8" y="${h - 17}" width="5" height="5" fill="#2bb673"/><rect x="15" y="${h - 17}" width="5" height="5" fill="#f2c230"/><rect x="22" y="${h - 17}" width="5" height="5" fill="#e5484d"/>
-      <text x="32" y="${h - 12}" class="map-text">PATHWAY INTEGRATION</text>
+      ${blocks.map(([bx, by, bw, bh]) => `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="#c9c6c0"/>`).join("")}
+      <path d="M10 30 H${w - 10} M10 62 H${w - 10} M37 8 V${h - 22} M94 8 V${h - 22}" stroke="#2bb673" stroke-width="2.4" fill="none"/>
+      <path d="M10 30 C 32 42, 54 52, 94 62" stroke="#f2c230" stroke-width="2.4" fill="none"/>
+      <path d="M94 62 L134 48 M62 62 L62 84" stroke="#e5484d" stroke-width="2.4" fill="none"/>
+      <path class="route" d="M37 8 V30 H94 V62" stroke="#ffffff" stroke-width="1" fill="none" opacity=".9"/>
+      <circle cx="62" cy="84" r="3" fill="#e5484d"/><circle cx="134" cy="48" r="3" fill="#e5484d"/>
+      <rect x="12" y="${h - 16}" width="5" height="5" fill="#2bb673"/><rect x="19" y="${h - 16}" width="5" height="5" fill="#f2c230"/><rect x="26" y="${h - 16}" width="5" height="5" fill="#e5484d"/>
+      <text x="36" y="${h - 11}" class="map-text">PATHWAY INTEGRATION</text>
     </g>`;
     s += obj("map", inner, P(0, (y1 + y2) / 2, z2 + 0.4));
   }
 
-  // ── Shelf with an accessible tiny-house model (slot: house) ─
+  // ── Street-name sign on the left wall (decor) ─────────────
+  {
+    const y1 = 6.5, y2 = 8.9, z1 = 5.55, z2 = 6.15, w = (y2 - y1) * S, h = (z2 - z1) * S;
+    s += poly([P(0.03, y1, z1), P(0.03, y2, z1), P(0.03, y2, z2), P(0.03, y1, z2)], "#1f7a4d");
+    s += `<g transform="${onFaceX(0.04, y2, z2)}"><rect x="2" y="2" width="${w - 4}" height="${h - 4}" fill="none" stroke="#fff" stroke-width="1.2" rx="2"/>
+      <text x="${w / 2}" y="${h / 2 + 4}" text-anchor="middle" class="sign-text">HOPKINS ST</text></g>`;
+  }
+
+  // ── Floating oak shelf with the tiny-house model (slot: house)
   {
     const col = colorOf("house", "#5b8def");
-    let inner = box(0, 6.4, 3.7, 0.85, 2.9, 0.12, "#a77650");
-    const Zs = 3.82, hx = 0.15, hy = 6.75, hw = 0.55, hd = 1.3, hh = 0.55;
-    inner += box(hx, hy, Zs, hw, hd, hh, "#f3efe6");
-    // gable roof (ridge runs along y)
+    let inner = box(0, 6.4, 3.72, 0.8, 2.9, 0.08, OAK);
+    const Zs = 3.8, hx = 0.13, hy = 6.75, hw = 0.55, hd = 1.3, hh = 0.55;
+    inner += box(hx, hy, Zs, hw, hd, hh, "#fbfaf7");
     const r = Zs + hh, peak = r + 0.38, mx = hx + hw / 2;
     inner += poly([P(hx + hw + 0.06, hy - 0.06, r), P(hx + hw + 0.06, hy + hd + 0.06, r), P(mx, hy + hd + 0.06, peak), P(mx, hy - 0.06, peak)], dark(col, 0.05));
     inner += poly([P(hx - 0.06, hy + hd + 0.06, r), P(hx + hw + 0.06, hy + hd + 0.06, r), P(mx, hy + hd + 0.06, peak)], light(col, 0.2));
-    // door + window on the front (x = hx + hw) face, and a ramp up to the door
     inner += `<g transform="${onFaceX(hx + hw + 0.005, hy + hd, r)}"><rect x="8" y="5" width="9" height="${hh * S - 5}" fill="${col}"/><rect x="26" y="5" width="11" height="8" fill="#bfe3ff"/></g>`;
     inner += poly([P(hx + hw, hy + hd - 0.55, Zs), P(hx + hw, hy + hd - 0.25, Zs), P(hx + hw + 0.32, hy + hd - 0.25 + 0.6, Zs), P(hx + hw + 0.32, hy + hd - 0.55 + 0.6, Zs)], "#d9d4c8");
-    // hard hat
-    const [kx, ky] = P(0.4, 8.95, Zs);
-    inner += `<ellipse cx="${kx}" cy="${ky}" rx="15" ry="6" fill="#f5c518"/><path d="M${kx - 11} ${ky - 1} a11 11 0 0 1 22 0 Z" fill="#ffd84a"/>`;
+    // mini traffic cone
+    const [qx, qy] = P(0.4, 8.85, Zs);
+    inner += `<path d="M${qx - 7} ${qy} L${qx - 1.5} ${qy - 24} L${qx + 1.5} ${qy - 24} L${qx + 7} ${qy} Z" fill="#ff7d41"/>
+      <path d="M${qx - 4.6} ${qy - 8} L${qx + 4.6} ${qy - 8} L${qx + 3.4} ${qy - 14} L${qx - 3.4} ${qy - 14} Z" fill="#fff"/>
+      <rect x="${qx - 9}" y="${qy - 1}" width="18" height="2.5" fill="#ff7d41"/>`;
     s += obj("house", inner, P(0.4, 7.4, 5.15));
   }
 
-  // ── Window with skyline on the right wall ─────────────────
-  {
-    const x1 = 5.7, x2 = 9.2, z1 = 3.5, z2 = 6.2, w = (x2 - x1) * S, h = (z2 - z1) * S;
-    s += `<g class="window">`;
-    s += poly([P(x1 - 0.15, 0, z1 - 0.15), P(x2 + 0.15, 0, z1 - 0.15), P(x2 + 0.15, 0, z2 + 0.15), P(x1 - 0.15, 0, z2 + 0.15)], "#8b6a4f");
-    s += poly([P(x1, 0, z1), P(x2, 0, z1), P(x2, 0, z2), P(x1, 0, z2)], "url(#sky)");
-    s += `<g transform="${onFaceY(x1, 0, z2)}">`;
-    const stars = [[14, 14], [40, 26], [70, 10], [96, 34], [26, 44], [108, 16], [58, 38]];
-    s += stars.map(([sx, sy], i) => `<circle class="star" cx="${sx}" cy="${sy}" r="${i % 3 ? 1 : 1.5}" style="animation-delay:${i * 0.4}s"/>`).join("");
-    s += `<circle class="moon" cx="${w * 0.75}" cy="${h * 0.28}" r="9"/>`;
-    s += `<path class="skyline" d="M0 ${h} V${h - 22} h9 v-10 h10 v18 h8 v-30 h4 v-6 h4 v6 h4 v30 h10 v-14 h12 v-8 h10 v26 h8 v-36 h12 v40 h10 v-18 h10 V${h} Z"/>`;
-    s += [[22, h - 26], [35, h - 38], [35, h - 30], [72, h - 20], [92, h - 40], [96, h - 30], [108, h - 18]]
-      .map(([wx, wy], i) => `<rect class="win-light" x="${wx}" y="${wy}" width="2.5" height="2.5" style="animation-delay:${i * 0.7}s"/>`).join("");
-    s += `<rect x="${w / 2 - 1.5}" y="0" width="3" height="${h}" fill="#8b6a4f"/><rect x="0" y="${h / 2 - 1.5}" width="${w}" height="3" fill="#8b6a4f"/>`;
-    s += `</g>`;
-    s += box(x1 - 0.2, 0, z1 - 0.32, x2 - x1 + 0.4, 0.35, 0.17, "#9b7a5c");
-    s += `</g>`;
-  }
-
-  // ── Community pinboard on the right wall (slot: board) ────
+  // ── Minimal felt pinboard on the right wall (slot: board) ──
   {
     const x1 = 0.9, x2 = 4.6, z1 = 4.0, z2 = 6.3, w = (x2 - x1) * S, h = (z2 - z1) * S;
-    let inner = box(x1, 0, z1, x2 - x1, 0.12, z2 - z1, "#9b6f45");
-    inner += `<g transform="${onFaceY(x1 + 0.08, 0.125, z2 - 0.08)}">
-      <rect width="${w - 5}" height="${h - 5}" fill="#d2a874"/>
-      ${[[8, 8, "#fff27a", -4], [42, 12, "#ffb3c7", 3], [78, 6, "#a8e6ff", -2], [14, 40, "#b9f5a8", 2], [52, 44, "#fff27a", -3], [90, 38, "#ffb3c7", 4]]
-        .map(([nx, ny, nc, r]) => `<g transform="rotate(${r} ${nx + 13} ${ny + 12})"><rect x="${nx}" y="${ny}" width="26" height="24" fill="${nc}"/>
-          <rect x="${nx + 4}" y="${ny + 7}" width="16" height="2" fill="#0003"/><rect x="${nx + 4}" y="${ny + 12}" width="12" height="2" fill="#0003"/></g>`).join("")}
-      <path d="M21 10 L55 14 L91 8 M27 42 L65 46 L103 40 M55 14 L65 46" stroke="#d64545" stroke-width="1" fill="none"/>
-      ${[[21, 10], [55, 14], [91, 8], [27, 42], [65, 46], [103, 40]].map(([px, py]) => `<circle cx="${px}" cy="${py}" r="2.2" fill="#d64545"/>`).join("")}
+    let inner = box(x1, 0, z1, x2 - x1, 0.06, z2 - z1, INK);
+    inner += `<g transform="${onFaceY(x1 + 0.05, 0.065, z2 - 0.05)}">
+      <rect width="${w - 3}" height="${h - 3}" fill="#e2e0db"/>
+      ${[[10, 10, "#fbfaf7"], [44, 10, "#d6efe3"], [78, 10, "#fbfaf7"], [10, 42, "#fdf1c9"], [44, 42, "#fbfaf7"], [78, 42, "#d6efe3"]]
+        .map(([nx, ny, nc]) => `<rect x="${nx}" y="${ny}" width="26" height="24" fill="${nc}"/>
+          <rect x="${nx + 4}" y="${ny + 7}" width="16" height="2" fill="#0002"/><rect x="${nx + 4}" y="${ny + 12}" width="11" height="2" fill="#0002"/>`).join("")}
+      ${[[23, 10], [57, 10], [91, 10], [23, 42], [57, 42], [91, 42]].map(([px, py]) => `<circle cx="${px}" cy="${py}" r="1.8" fill="${INK}"/>`).join("")}
     </g>`;
     s += obj("board", inner, P((x1 + x2) / 2, 0.1, z2 + 0.4));
   }
 
-  // ── Desk ──────────────────────────────────────────────────
-  const DZ = 2.5, DT = 0.2, TOP = DZ + DT;
-  s += box(0.9, 0.35, 0, 0.2, 0.2, DZ, "#6e4a2f") + box(5.3, 0.35, 0, 0.2, 0.2, DZ, "#6e4a2f");
-  s += box(0.9, 2.55, 0, 0.2, 0.2, DZ, "#7d5537") + box(5.3, 2.55, 0, 0.2, 0.2, DZ, "#7d5537");
-  s += box(0.7, 0.2, DZ, 5.0, 2.7, DT, "#b98455");
+  // ── Rug ───────────────────────────────────────────────────
+  s += flat(3.4, 3.4, 0.005, 6.0, 5.6, "var(--rug)");
 
-  // Architect lamp (click to toggle)
+  // ── Desk: white top on slim black legs ────────────────────
+  const DZ = 2.55, DT = 0.12, TOP = DZ + DT;
+  s += box(0.85, 0.3, 0, 0.07, 0.07, DZ, INK) + box(5.45, 0.3, 0, 0.07, 0.07, DZ, INK);
+  s += box(0.85, 2.7, 0, 0.07, 0.07, DZ, INK) + box(5.45, 2.7, 0, 0.07, 0.07, DZ, INK);
+  s += box(0.7, 0.2, DZ, 5.0, 2.7, DT, WHITE);
+
+  // Task lamp (click to toggle)
   {
-    const [bx, by] = P(1.35, 0.75, TOP + 0.12);
-    const [jx, jy] = P(1.35, 0.75, TOP + 1.8);
+    const [bx, by] = P(1.35, 0.75, TOP + 0.05);
+    const [jx, jy] = P(1.35, 0.75, TOP + 1.9);
     const [hx, hy] = P(2.0, 1.35, TOP + 2.2);
     s += `<g class="obj toggle" id="lamp" tabindex="0" role="button" aria-label="Toggle desk lamp">
-      ${cyl(1.35, 0.75, TOP, 0.36, 0.12, "#3b3d4a")}
-      <path d="M${bx} ${by} L${jx} ${jy} L${hx} ${hy}" stroke="#3b3d4a" stroke-width="4" fill="none" stroke-linecap="round"/>
-      <circle cx="${jx}" cy="${jy}" r="4" fill="#4a4c5a"/>
-      <path d="M${hx - 16} ${hy - 4} L${hx + 6} ${hy - 14} L${hx + 14} ${hy + 6} L${hx - 4} ${hy + 14} Z" fill="#ff7d41"/>
-      <ellipse class="bulb" cx="${hx + 4}" cy="${hy + 9}" rx="7" ry="4" fill="#fff4d6"/>
+      ${cyl(1.35, 0.75, TOP, 0.3, 0.05, INK)}
+      <path d="M${bx} ${by} L${jx} ${jy} L${hx} ${hy}" stroke="${INK}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      <path d="M${hx - 13} ${hy + 3} A13 9 0 0 1 ${hx + 13} ${hy + 3} Z" fill="${INK}"/>
+      <ellipse class="bulb" cx="${hx}" cy="${hy + 4}" rx="9" ry="3" fill="#fff4d6"/>
     </g>`;
   }
 
-  // Monitor with a SketchUp-style street render (slot: monitor)
+  // Thin-bezel monitor with a SketchUp-style street render (slot: monitor)
   {
-    const x = 2.3, y = 0.4, w = 2.8, d = 0.45, z = TOP + 0.5, h = 1.9;
-    let inner = box(3.45, 0.5, TOP, 0.5, 0.3, 0.5, "#2f313d") + box(3.1, 0.35, TOP, 1.2, 0.7, 0.06, "#2f313d");
-    inner += box(x, y, z, w, d, h, "#2b2d38");
-    const sw = (w - 0.24) * S, sh = (h - 0.24) * S;
-    inner += `<g transform="${onFaceY(x + 0.12, y + d + 0.01, z + h - 0.12)}">
-      <rect width="${sw}" height="${sh}" rx="2" fill="#dfeefa"/>
-      <rect x="0" y="0" width="${sw}" height="6" fill="#3b3d4a"/><circle cx="4" cy="3" r="1.3" fill="#e5484d"/><circle cx="8" cy="3" r="1.3" fill="#f2c230"/>
+    const x = 2.3, y = 0.45, w = 2.8, d = 0.12, z = TOP + 0.55, h = 1.75;
+    let inner = box(3.15, 0.35, TOP, 1.1, 0.55, 0.03, "#3a3a3a") + box(3.6, 0.42, TOP, 0.2, 0.12, 0.6, "#3a3a3a");
+    inner += box(x, y, z, w, d, h, "#1d1d1d");
+    const sw = (w - 0.1) * S, sh = (h - 0.1) * S;
+    inner += `<g transform="${onFaceY(x + 0.05, y + d + 0.005, z + h - 0.05)}">
+      <rect width="${sw}" height="${sh}" fill="#e6f1fa"/>
+      <rect x="0" y="0" width="${sw}" height="6" fill="#f4f4f4"/><circle cx="4" cy="3" r="1.3" fill="#e5484d"/><circle cx="8" cy="3" r="1.3" fill="#f2c230"/><circle cx="12" cy="3" r="1.3" fill="#2bb673"/>
       <path d="M${sw * 0.18} ${sh * 0.72} V${sh * 0.42} A${sw * 0.32} ${sh * 0.36} 0 0 1 ${sw * 0.82} ${sh * 0.42} V${sh * 0.72} Z" fill="#e8dcc6"/>
       ${[0.36, 0.45, 0.55, 0.64].map((f) => `<rect x="${sw * f - 2}" y="${sh * 0.36}" width="4" height="${sh * 0.3}" fill="#9fb7c9"/>`).join("")}
       <rect x="0" y="${sh * 0.72}" width="${sw}" height="${sh * 0.28}" fill="#8b8f99"/>
@@ -215,36 +229,54 @@
     s += obj("monitor", inner, P(x + w / 2, y + d / 2, z + h + 0.7));
   }
 
-  // Plan sheet with scale ruler + coffee (decor)
-  s += flat(1.1, 1.55, TOP + 0.005, 1.5, 1.05, "#e9f1f7");
-  s += `<g transform="${onTop(1.18, 1.62, TOP + 0.01)}"><path d="M3 8 H44 M3 18 H44 M14 3 V32 M30 3 V32" stroke="#6fa3d1" stroke-width="1.2" fill="none"/><rect x="16" y="20" width="12" height="9" fill="none" stroke="#e07a50" stroke-width="1.2"/></g>`;
-  s += box(2.8, 2.2, TOP, 1.6, 0.18, 0.06, "#e8e2d5");
-  s += cyl(4.9, 1.9, TOP, 0.25, 0.45, "#e8664f");
-  s += `<path class="steam" d="M${P(4.9, 1.9, TOP + 0.55)[0]} ${P(4.9, 1.9, TOP + 0.55)[1]} q-5 -8 0 -16 q5 -8 0 -16" />`;
-
-  // ── Blueprint bin (slot: blueprints) ──────────────────────
+  // Tracing pad with a perspective sketch of a ramp + stairs (slot: pad)
   {
-    const col = colorOf("blueprints", "#64b4ff");
-    let inner = "";
-    [[6.75, 0.85, 2.0], [7.05, 0.75, 2.4], [6.95, 1.15, 1.7], [7.25, 1.05, 2.15]].forEach(([cx, cy, hh]) => (inner += cyl(cx, cy, 0.4, 0.13, hh, col)));
-    inner += cyl(7.0, 0.95, 0, 0.55, 1.2, "#3b3d4a");
-    s += obj("blueprints", inner, P(7.0, 0.95, 3.4));
+    const x = 0.95, y = 1.3, w = 2.05, d = 1.3;
+    let inner = flat(x + 0.08, y + 0.06, TOP + 0.004, w, d, "#ffffff");
+    inner += flat(x, y, TOP + 0.008, w, d, "#fbf3d2");
+    const pw = w * S, pd = d * S;
+    inner += `<g transform="${onTop(x, y, TOP + 0.01)}" class="sketch">
+      <path d="M4 ${pd - 6} L${pw * 0.5} ${pd * 0.3} L${pw - 4} ${pd - 6}" stroke="#8e8a80" stroke-width=".6" fill="none" stroke-dasharray="2 2"/>
+      ${Array.from({ length: 7 }, (_, i) => { const t = i / 7, yy = pd - 8 - t * (pd * 0.55), half = (1 - t) * pw * 0.2 + 3; return `<path d="M${pw * 0.36 - half} ${yy} H${pw * 0.36 + half}" stroke="#4a4744" stroke-width=".9"/>`; }).join("")}
+      <path d="M${pw * 0.56} ${pd - 6} L${pw * 0.52} ${pd * 0.34} M${pw * 0.86} ${pd - 6} L${pw * 0.6} ${pd * 0.34}" stroke="#4a4744" stroke-width="1" fill="none"/>
+      <path d="M${pw * 0.6} ${pd - 16} L${pw * 0.82} ${pd - 16} M${pw * 0.57} ${pd - 28} L${pw * 0.74} ${pd - 28}" stroke="#2bb673" stroke-width="1.1"/>
+      <path d="M8 10 q4 -6 8 0 q4 -6 8 0 M${pw - 22} 10 q4 -6 8 0 q4 -6 8 0" stroke="#7d7a72" stroke-width=".8" fill="none"/>
+      <path d="M6 ${pd - 3} H${pw * 0.3}" stroke="#4a4744" stroke-width=".5"/>
+    </g>`;
+    // pencil
+    inner += box(x + 0.35, y + d + 0.08, TOP, 1.25, 0.07, 0.07, "#f2c230");
+    inner += poly([P(x + 0.35, y + d + 0.08, TOP + 0.035), P(x + 0.35, y + d + 0.15, TOP + 0.035), P(x + 0.2, y + d + 0.115, TOP + 0.035)], "#e8cfa5");
+    s += obj("pad", inner, P(x + w / 2, y + d / 2, TOP + 1.3));
   }
 
-  // ── Chair (decor) ─────────────────────────────────────────
-  s += box(3.1, 3.8, 0, 0.16, 0.16, 1.4, "#3b3d4a");
-  s += box(2.6, 3.3, 1.4, 1.2, 1.1, 0.2, "#4b5263");
-  s += box(2.6, 4.25, 1.6, 1.2, 0.16, 1.5, "#5a6275");
+  // Keyboard, ceramic mug (decor)
+  s += box(3.2, 2.15, TOP, 1.45, 0.45, 0.04, "#e4e2dd");
+  s += cyl(4.9, 1.9, TOP, 0.22, 0.4, "#fbfaf7");
+  s += `<path class="steam" d="M${P(4.9, 1.9, TOP + 0.5)[0]} ${P(4.9, 1.9, TOP + 0.5)[1]} q-5 -8 0 -16 q5 -8 0 -16" />`;
+
+  // ── Drawing tube holder (slot: blueprints) ────────────────
+  {
+    const col = colorOf("blueprints", "#9cc7ef");
+    let inner = "";
+    [[6.35, 0.85, 2.0], [6.65, 0.75, 2.35], [6.55, 1.15, 1.7], [6.85, 1.05, 2.1]].forEach(([cx, cy, hh]) => (inner += cyl(cx, cy, 0.4, 0.12, hh, col)));
+    inner += cyl(6.6, 0.95, 0, 0.5, 1.15, INK);
+    s += obj("blueprints", inner, P(6.6, 0.95, 3.3));
+  }
+
+  // ── Shell chair (decor) ───────────────────────────────────
+  s += box(3.12, 3.82, 0, 0.06, 0.06, 1.4, INK) + box(2.7, 3.4, 0, 0.05, 0.05, 1.4, INK) + box(3.6, 3.4, 0, 0.05, 0.05, 1.4, INK);
+  s += box(2.6, 3.3, 1.4, 1.15, 1.05, 0.12, WHITE);
+  s += box(2.6, 4.25, 1.52, 1.15, 0.1, 1.25, WHITE);
 
   // ── 3D campus figure-ground model table (slot: model) ──────
   // Built from the same grid as the full 3D viewer (assets/campus3d.js).
   {
-    const tx = 4.2, ty = 4.2, tw = 4.6, td = 3.6, tz = 1.6;
-    let inner = box(tx + 0.1, ty + 0.1, 0, 0.2, 0.2, tz, "#5a4030") + box(tx + tw - 0.3, ty + 0.1, 0, 0.2, 0.2, tz, "#5a4030");
-    inner += box(tx + 0.1, ty + td - 0.3, 0, 0.2, 0.2, tz, "#6b4b37") + box(tx + tw - 0.3, ty + td - 0.3, 0, 0.2, 0.2, tz, "#6b4b37");
-    inner += box(tx, ty, tz, tw, td, 0.18, "#4a4d5c");
-    const Z0 = tz + 0.18;
-    inner += flat(tx + 0.12, ty + 0.12, Z0 + 0.01, tw - 0.24, td - 0.24, "#f7f6f2");
+    const tx = 4.2, ty = 4.2, tw = 4.6, td = 3.6, tz = 1.65;
+    let inner = box(tx + 0.15, ty + 0.15, 0, 0.07, 0.07, tz, INK) + box(tx + tw - 0.22, ty + 0.15, 0, 0.07, 0.07, tz, INK);
+    inner += box(tx + 0.15, ty + td - 0.22, 0, 0.07, 0.07, tz, INK) + box(tx + tw - 0.22, ty + td - 0.22, 0, 0.07, 0.07, tz, INK);
+    inner += box(tx, ty, tz, tw, td, 0.1, WHITE);
+    const Z0 = tz + 0.1;
+    inner += flat(tx + 0.15, ty + 0.15, Z0 + 0.005, tw - 0.3, td - 0.3, "#ffffff");
     const C3 = window.CAMPUS3D;
     if (C3) {
       const hts = Uint8Array.from(atob(C3.heights), (c) => c.charCodeAt(0));
@@ -259,44 +291,44 @@
       }
       // painter's order: back (small x+y) to front
       cells.sort((a, b) => a[0] + a[1] - (b[0] + b[1]));
-      cells.forEach(([gx, gy, m]) => (inner += box(ox + gx * cw, oy + gy * cd, Z0 + 0.02, cw, cd, 0.05 + (m / 255) * 0.38, "#77706d")));
+      cells.forEach(([gx, gy, m]) => (inner += box(ox + gx * cw, oy + gy * cd, Z0 + 0.01, cw, cd, 0.05 + (m / 255) * 0.38, "#9a948f")));
     }
+    // scale figure standing at the model's front corner
+    const [px, py] = P(tx + tw - 0.35, ty + td - 0.35, Z0);
+    inner += `<g class="scale-fig"><circle cx="${px}" cy="${py - 13}" r="2.6" fill="#2bb673"/><rect x="${px - 2}" y="${py - 10.5}" width="4" height="10.5" rx="1.5" fill="#2bb673"/></g>`;
     s += obj("model", inner, P(tx + tw / 2, ty + td / 2, Z0 + 2.4));
   }
 
-  // ── Street tree in a planter (slot: tree) ─────────────────
+  // ── Plant in a white planter (slot: tree) ─────────────────
   {
-    const col = colorOf("tree", "#50c878");
-    let inner = box(0.6, 7.6, 0, 1.1, 1.1, 0.8, "#8d8f9c");
-    inner += flat(0.68, 7.68, 0.81, 0.94, 0.94, "#5b3f2a");
-    const [bx, by] = P(1.15, 8.15, 0.8);
-    inner += `<rect x="${bx - 3}" y="${by - 58}" width="6" height="58" fill="#7a5a3c"/>
-      <circle cx="${bx}" cy="${by - 72}" r="28" fill="${dark(col, 0.12)}"/>
-      <circle cx="${bx - 16}" cy="${by - 62}" r="18" fill="${col}"/>
-      <circle cx="${bx + 15}" cy="${by - 64}" r="19" fill="${col}"/>
-      <circle cx="${bx - 4}" cy="${by - 86}" r="17" fill="${light(col, 0.18)}"/>`;
-    s += obj("tree", inner, [bx, by - 116]);
+    const col = colorOf("tree", "#3f9a5c");
+    let inner = cyl(1.15, 8.15, 0, 0.55, 0.95, "#f1f0ec");
+    const [bx, by] = P(1.15, 8.15, 0.95);
+    const leaves = [[-22, -44, -30], [20, -50, 28], [-6, -70, -8], [-30, -24, -55], [28, -28, 52], [8, -38, 14], [-14, -58, -20], [16, -66, 18]];
+    inner += leaves.map(([dx, dy, rot], i) => `<path d="M${bx} ${by} Q${bx + dx * 0.3} ${by + dy * 0.55} ${bx + dx} ${by + dy}" stroke="${dark(col, 0.3)}" stroke-width="1.6" fill="none"/>
+      <ellipse cx="${bx + dx}" cy="${by + dy}" rx="13" ry="7.5" transform="rotate(${rot} ${bx + dx} ${by + dy})" fill="${i % 2 ? col : light(col, 0.18)}"/>`).join("");
+    s += obj("tree", inner, [bx, by - 92]);
   }
 
-  // ── Traffic cone (decor) ──────────────────────────────────
+  // ── Arc floor lamp (decor) ────────────────────────────────
   {
-    s += box(3.0, 8.7, 0, 0.6, 0.6, 0.05, "#ff7d41");
-    const [cx, cy] = P(3.3, 9.0, 0.05);
-    s += `<path d="M${cx - 9} ${cy} L${cx - 2} ${cy - 34} L${cx + 2} ${cy - 34} L${cx + 9} ${cy} Z" fill="#ff7d41"/>
-      <path d="M${cx - 6} ${cy - 12} L${cx + 6} ${cy - 12} L${cx + 4.5} ${cy - 20} L${cx - 4.5} ${cy - 20} Z" fill="#fff"/>`;
+    const [fx, fy] = P(2.3, 9.0, 0.06), [ax, ay] = P(3.4, 7.0, 4.6);
+    s += cyl(2.3, 9.0, 0, 0.32, 0.06, INK);
+    s += `<path d="M${fx} ${fy} C ${fx - 6} ${fy - 150}, ${ax - 30} ${ay - 40}, ${ax} ${ay}" stroke="${INK}" stroke-width="2.2" fill="none"/>
+      <path d="M${ax - 12} ${ay + 10} A12 10 0 0 1 ${ax + 12} ${ay + 10} Z" fill="${INK}"/>`;
   }
 
   // ── BLINK "Future City" light sculpture (slot: blink) ──────
   // Stacked recycled-cardboard towers with LED windows that cycle colour.
   {
     const towers = [[8.55, 8.35, 0.55, 0.55, 1.5], [9.15, 8.35, 0.5, 0.5, 2.2], [8.55, 8.95, 0.5, 0.5, 1.0], [9.1, 8.9, 0.55, 0.6, 1.35]];
-    let inner = box(8.4, 8.2, 0, 1.45, 1.45, 0.12, "#8a6a4a");
+    let inner = box(8.4, 8.2, 0, 1.45, 1.45, 0.1, INK);
     towers.sort((a, b) => a[0] + a[1] - (b[0] + b[1])).forEach(([x, y, w, d, h], ti) => {
-      inner += box(x, y, 0.12, w, d, h, "#c99a63");
+      inner += box(x, y, 0.1, w, d, h, "#c99a63");
       const rows = Math.floor(h / 0.3);
-      inner += `<g transform="${onFaceX(x + w + 0.005, y + d, 0.12 + h - 0.08)}">` +
+      inner += `<g transform="${onFaceX(x + w + 0.005, y + d, 0.1 + h - 0.08)}">` +
         Array.from({ length: rows }, (_, r) => [0, 1].map((c) => `<rect class="led" x="${3 + c * 8}" y="${3 + r * 10}" width="5" height="5" style="animation-delay:${(ti * 3 + r + c) * 0.37}s"/>`).join("")).join("") + `</g>`;
-      inner += `<g transform="${onFaceY(x, y + d + 0.005, 0.12 + h - 0.08)}">` +
+      inner += `<g transform="${onFaceY(x, y + d + 0.005, 0.1 + h - 0.08)}">` +
         Array.from({ length: rows }, (_, r) => [0, 1].map((c) => `<rect class="led" x="${3 + c * 8}" y="${3 + r * 10}" width="5" height="5" style="animation-delay:${(ti * 5 + r * 2 + c) * 0.29}s"/>`).join("")).join("") + `</g>`;
     });
     const [gx, gy] = P(9.1, 8.9, 1.2);
