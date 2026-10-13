@@ -199,6 +199,8 @@ h2.spaced { text-transform: uppercase; letter-spacing: .28em; font-size: clamp(1
 @keyframes led { 0% { fill: #ffd76a; } 25% { fill: #ff7ab8; } 50% { fill: #8fd3ff; } 75% { fill: #a6f08a; } 100% { fill: #ffd76a; } }
 .led-vein { fill: none; stroke-linecap: round; animation: vein 3.2s linear infinite; }
 @keyframes vein { 0% { stroke: #ffd76a; } 25% { stroke: #a6f08a; } 50% { stroke: #8fd3ff; } 75% { stroke: #ff9ec9; } 100% { stroke: #ffd76a; } }
+.fairy { fill: #fff3c4; filter: drop-shadow(0 0 2px #ffd36b); animation: fairy 2.4s ease-in-out infinite; }
+@keyframes fairy { 50% { opacity: .35; } }
 .blink-glow { fill: url(#blinkGlow); pointer-events: none; mix-blend-mode: screen; animation: twinkle 3.2s ease-in-out infinite; }
 :root[data-theme="light"] .blink-glow { mix-blend-mode: multiply; opacity: .5; }
 

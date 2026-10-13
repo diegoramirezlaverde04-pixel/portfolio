@@ -85,7 +85,7 @@
       <stop offset="0" style="stop-color:var(--sky-1)"/><stop offset="1" style="stop-color:var(--sky-2)"/>
     </linearGradient>
     <radialGradient id="lampGlow"><stop offset="0" stop-color="#ffd59a" stop-opacity=".7"/><stop offset=".45" stop-color="#ffb35c" stop-opacity=".22"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></radialGradient>
-    <radialGradient id="blinkGlow"><stop offset="0" stop-color="#d79bff" stop-opacity=".45"/><stop offset="1" stop-color="#d79bff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="blinkGlow"><stop offset="0" stop-color="#ffb15c" stop-opacity=".4"/><stop offset="1" stop-color="#ffb15c" stop-opacity="0"/></radialGradient>
   </defs>`;
 
   // Modern palette: white walls, light oak, matte black details.
@@ -337,23 +337,33 @@
   }
 
   // ── BLINK "Future City" leaf sculpture on a stand (slot: blink) ──
-  // Recycled cardboard leaf with LED-lit veins.
+  // A mosaic of translucent red/orange/yellow/green panels with string lights,
+  // after the real piece.
   {
     const cx = 9.05, cy = 2.75;
     const [fx, fy] = P(cx, cy, 0);
-    const sx = fx, sy = fy - 70;                 // where the stem meets the leaf
+    const sx = fx, sy = fy - 60, L = 122, HW = 40;   // stem point, leaf length, half width
+    const half = (v) => HW * Math.pow(Math.sin(Math.PI * Math.pow(v, 0.8)), 0.9); // widest below the middle, pointed tip // width along the leaf
     let inner = cyl(cx, cy, 0, 0.3, 0.04, INK);
     inner += `<path d="M${fx} ${fy - 2} V${sy}" stroke="${INK}" stroke-width="2"/>`;
-    // leaf (tip up, slightly tilted)
-    inner += `<g transform="rotate(-14 ${sx} ${sy})">
-      <path d="M${sx} ${sy} C${sx - 40} ${sy - 18} ${sx - 34} ${sy - 74} ${sx} ${sy - 104} C${sx + 34} ${sy - 74} ${sx + 40} ${sy - 18} ${sx} ${sy} Z" fill="#c99a63" stroke="#a87c48" stroke-width="1"/>
-      <path d="M${sx} ${sy} C${sx - 40} ${sy - 18} ${sx - 34} ${sy - 74} ${sx} ${sy - 104} Z" fill="#b5864f"/>
-      <path class="led-vein" d="M${sx} ${sy + 2} V${sy - 100}" stroke-width="2"/>
-      ${[[-22, 18, 8], [22, 18, 8], [-22, 36, 26], [22, 36, 26], [-20, 54, 44], [20, 54, 44], [-14, 72, 62], [14, 72, 62], [-8, 88, 80], [8, 88, 80]]
-        .map(([dx, ey, my], i) => `<path class="led-vein" d="M${sx} ${sy - my} Q${sx + dx * 0.55} ${sy - ey + 4} ${sx + dx} ${sy - ey - 4}" stroke-width="1.3" style="animation-delay:-${(i * 0.27).toFixed(2)}s"/>`).join("")}
+    let seed = 11; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const COLS = ["#e5484d", "#f06a2a", "#f5a524", "#f2d231", "#8cc63f", "#d93a3a"];
+    let tiles = "", lights = [];
+    for (let v = 0.03; v < 0.97; v += 0.06) {
+      const w = half(v);
+      for (let u = -w + 4; u < w - 3; u += 9) {
+        const x = sx + u + (rnd() - 0.5) * 3, y = sy - v * L + (rnd() - 0.5) * 3, z = 8 + rnd() * 3.5;
+        tiles += `<rect x="${(x - z / 2).toFixed(1)}" y="${(y - z / 2).toFixed(1)}" width="${z.toFixed(1)}" height="${z.toFixed(1)}" fill="${COLS[(rnd() * COLS.length) | 0]}" opacity=".88" transform="rotate(${((rnd() - 0.5) * 50).toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
+        if (rnd() < 0.5) lights.push([x + (rnd() - 0.5) * 4, y + (rnd() - 0.5) * 4]);
+      }
+    }
+        inner += `<g transform="rotate(-12 ${sx} ${sy})">
+      <path d="M${sx} ${sy + 2} C${sx - 52} ${sy - 30} ${sx - 40} ${sy - 86} ${sx} ${sy - L - 6} C${sx + 40} ${sy - 86} ${sx + 52} ${sy - 30} ${sx} ${sy + 2} Z" fill="#3f7d3a" opacity=".5"/>
+      ${tiles}
+      ${lights.map(([x, y], i) => `<circle class="fairy" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.8" style="animation-delay:-${((i * 0.37) % 2.4).toFixed(2)}s"/>`).join("")}
     </g>`;
-    inner += `<circle class="blink-glow" cx="${sx}" cy="${sy - 52}" r="62"/>`;
-    s += obj("blink", inner, [sx - 12, sy - 120]);
+    inner += `<circle class="blink-glow" cx="${sx}" cy="${sy - 50}" r="64"/>`;
+    s += obj("blink", inner, [sx - 14, sy - 140]);
   }
 
   // ── Lighting overlays ─────────────────────────────────────

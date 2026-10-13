@@ -173,11 +173,16 @@ window.PORTFOLIO = {
       summary: "An illuminated, leaf-shaped wearable sculpture about urban sustainability for BLINK, Cincinnati's light and art festival.",
       description: [
         "For BLINK, the nation's largest light and art festival, I designed an illuminated, leaf-shaped wearable sculpture featuring urban sustainability.",
-        "I engineered and prototyped 15+ pieces from recycled cardboard and LED lighting within a one-week build. The work was featured on the BLINK website, in the Cincinnati Enquirer and on UC DAAP social media, reaching 10K+ viewers.",
+        "The leaf is built from overlapping translucent panels in autumn reds, oranges, yellows and greens, wrapped in LED string lights. I engineered and prototyped 15+ pieces from recycled cardboard and LED lighting within a one-week build. The work was featured on the BLINK website, in the Cincinnati Enquirer and on UC DAAP social media, reaching 10K+ viewers.",
       ],
       tags: ["installation", "sustainability"],
       stack: ["Recycled cardboard", "LED lighting", "Prototyping"],
-      color: "#b06bf2",
+      color: "#e8742c",
+      cover: "assets/img/blink-leaf.jpg",
+      gallery: [
+        { src: "assets/img/blink-leaf.jpg", caption: "The illuminated leaf sculpture on the Cincinnati riverfront", group: "The piece" },
+        { src: "assets/img/blink-leaf-detail.jpg", caption: "Detail: overlapping translucent panels and LED string lights", group: "The piece" },
+      ],
       links: {},
     },
   ],
