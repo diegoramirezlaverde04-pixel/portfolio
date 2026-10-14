@@ -96,7 +96,7 @@ window.PORTFOLIO = {
       id: "inclusive-vs-compliant",
       num: "02",
       title: "Inclusive vs. Compliant Pathways",
-      room: ["pad", "map"],
+      room: "map",
       context: "UC DAAP coursework",
       status: "live",
       summary: "Where UC's wheelchair-accessible routes split from the paths most students actually use.",
