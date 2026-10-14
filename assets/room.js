@@ -303,9 +303,6 @@
     }
     // plaque on the table's front edge
     inner += `<g transform="${onFaceY(tx + 0.5, ty + td + 0.002, tz + 0.09)}"><rect width="${1.5 * S}" height="${0.08 * S}" fill="${INK}"/><text x="${0.75 * S}" y="${0.08 * S - 0.6}" text-anchor="middle" class="plaque-text">UC CAMPUS · FIGURE-GROUND</text></g>`;
-    // scale figure at the model's front corner
-    const [px, py] = P(tx + tw - 0.3, ty + td - 0.3, Z0);
-    inner += `<g class="scale-fig"><circle cx="${px}" cy="${py - 13}" r="2.6" fill="#2bb673"/><rect x="${px - 2}" y="${py - 10.5}" width="4" height="10.5" rx="1.5" fill="#2bb673"/></g>`;
     s += obj("model", inner, P(tx + tw / 2, ty + td / 2, Z0 + 2.4));
   }
 
