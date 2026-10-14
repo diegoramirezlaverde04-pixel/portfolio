@@ -229,7 +229,7 @@
       ${icons.map((c, i) => `<rect x="${1.2 + i * 4.2}" y="${tb + 0.8}" width="3" height="2.4" rx=".5" fill="${c}" opacity=".85"/>`).join("")}
       <rect x="0" y="${tb + tool}" width="${pal}" height="${sh - tb - tool - st}" fill="#e2e0dc"/>
       ${Array.from({ length: 9 }, (_, i) => `<rect x="1" y="${tb + tool + 1.2 + i * 4.3}" width="4" height="3.2" rx=".6" fill="${i === 2 ? "#5b8def" : "#b9b6b0"}"/>`).join("")}
-      <image href="assets/img/hopkins-after-intersection.jpg" x="${vx}" y="${vy}" width="${vw}" height="${vh}" preserveAspectRatio="xMidYMid slice" clip-path="url(#vp)"/>
+      <image href="assets/img/hopkins-after-aerial.jpg" x="${vx}" y="${vy - vh * 0.09}" width="${vw}" height="${vh * 1.09}" preserveAspectRatio="xMidYMax slice" clip-path="url(#vp)"/>
       <path d="M${vx + vw * 0.62} ${vy + vh * 0.42} l0 5.5 l1.4 -1.3 l1.1 2.3 l.9 -.4 l-1.1 -2.3 l1.9 0 Z" fill="#fff" stroke="#222" stroke-width=".35"/>
       <rect x="0" y="${sh - st}" width="${sw}" height="${st}" fill="#dcdad6"/>
       <rect x="1.5" y="${sh - st + 1.2}" width="22" height="1" fill="#9a978f"/>
