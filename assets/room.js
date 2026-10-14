@@ -297,9 +297,6 @@
       // painter's order: back (small x+y) to front
       cells.sort((p, q) => p[0] + p[1] - (q[0] + q[1]));
       cells.forEach(([gx, gy, m]) => inner += box(ox + gx * cw, oy + gy * cw, Zb, cw, cw, 0.04 + (m / 255) * 0.42, "#d3cec6"));
-      // north arrow
-      const [nx, ny] = P(ox + mw - 0.18, oy + 0.2, Zb);
-      inner += `<path d="M${nx} ${ny - 9} l3.5 8 l-3.5 -2 l-3.5 2 Z" fill="${INK}"/>`;
     }
     // plaque on the table's front edge
     inner += `<g transform="${onFaceY(tx + 0.5, ty + td + 0.002, tz + 0.09)}"><rect width="${1.5 * S}" height="${0.08 * S}" fill="${INK}"/><text x="${0.75 * S}" y="${0.08 * S - 0.6}" text-anchor="middle" class="plaque-text">UC CAMPUS · FIGURE-GROUND</text></g>`;
