@@ -288,23 +288,15 @@
       inner += box(ox - 0.04, oy - 0.04, Z0, mw + 0.08, md + 0.08, 0.04, "#fbfaf7");
       const Zb = Z0 + 0.041;
       inner += `<g transform="${onTop(ox, oy, Zb)}"><image href="assets/img/campus-figure-ground.jpg" width="${mw * S}" height="${md * S}" preserveAspectRatio="none" opacity=".55"/></g>`;
-      const cells = [], empty = [];
+      const cells = [];
       for (let gy = 0; gy < gh; gy++) for (let gx = 0; gx < gw; gx++) {
         let m = 0, n = 0;
         for (let yy = 0; yy < F; yy++) for (let xx = 0; xx < F; xx++) { const v = hts[(gy * F + yy) * C3.w + gx * F + xx]; if (v) { n++; m = Math.max(m, v); } }
         if (n > F * F * 0.45) cells.push([gx, gy, m]);
-        else if (!n) empty.push([gx, gy]);
       }
-      // a few street trees in open space (deterministic)
-      const occupied = new Set(cells.map(([x, y]) => x + "," + y));
-      const trees = empty.filter(([x, y], i) => (x * 7 + y * 13) % 23 === 0 && !occupied.has(x + 1 + "," + y) && !occupied.has(x + "," + (y + 1)) && !occupied.has(x - 1 + "," + y) && !occupied.has(x + "," + (y - 1)));
-      const items = cells.map((c) => ["b", ...c]).concat(trees.map(([x, y]) => ["t", x, y]));
-      items.sort((p, q) => p[1] + p[2] - (q[1] + q[2]));
-      items.forEach(([k, gx, gy, m]) => {
-        const x = ox + gx * cw, y = oy + gy * cw;
-        if (k === "b") inner += box(x, y, Zb, cw, cw, 0.04 + (m / 255) * 0.42, "#d3cec6");
-        else { const [px, py] = P(x + cw / 2, y + cw / 2, Zb); inner += `<circle cx="${px}" cy="${py - 3}" r="2.6" fill="#5fae6e"/>`; }
-      });
+      // painter's order: back (small x+y) to front
+      cells.sort((p, q) => p[0] + p[1] - (q[0] + q[1]));
+      cells.forEach(([gx, gy, m]) => inner += box(ox + gx * cw, oy + gy * cw, Zb, cw, cw, 0.04 + (m / 255) * 0.42, "#d3cec6"));
       // north arrow
       const [nx, ny] = P(ox + mw - 0.18, oy + 0.2, Zb);
       inner += `<path d="M${nx} ${ny - 9} l3.5 8 l-3.5 -2 l-3.5 2 Z" fill="${INK}"/>`;
