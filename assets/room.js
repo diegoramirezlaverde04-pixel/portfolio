@@ -201,7 +201,7 @@
       <g transform="rotate(-2 ${8 + pw / 2} ${6 + ph / 2})">
         <rect x="7" y="6.5" width="${pw + 2}" height="${ph + 2}" fill="#0002"/>
         <rect x="6" y="5.5" width="${pw + 2}" height="${ph + 2}" fill="#fff"/>
-        <image href="assets/img/union-park-site-plan.jpg" x="7" y="6.5" width="${pw}" height="${ph}" preserveAspectRatio="none"/>
+        <image href="assets/img/union-park-site-plan.webp" x="7" y="6.5" width="${pw}" height="${ph}" preserveAspectRatio="none"/>
       </g>
       <rect x="${pw + 16}" y="8" width="34" height="13" fill="#3f78b5"/>
       <text x="${pw + 33}" y="16.4" text-anchor="middle" class="board-title">UNION PARK</text>
