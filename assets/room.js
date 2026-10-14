@@ -128,20 +128,21 @@
   }
 
   // ── Framed pathway-integration map on the left wall (slot: map)
+  // The actual map from the Inclusive vs. Compliant project, with its legend.
   {
-    const y1 = 1.2, y2 = 5.8, z1 = 3.0, z2 = 6.2, w = (y2 - y1) * S, h = (z2 - z1) * S;
+    const pad = 6, mapW = 116, mapH = Math.round(mapW * 566 / 560), legH = 20;
+    const w = mapW + pad * 2, h = mapH + pad * 2 + legH;
+    const y1 = 1.5, y2 = y1 + w / S, z2 = 6.45, z1 = z2 - h / S;
     let inner = poly([P(0.02, y1 - 0.06, z1 - 0.06), P(0.02, y2 + 0.06, z1 - 0.06), P(0.02, y2 + 0.06, z2 + 0.06), P(0.02, y1 - 0.06, z2 + 0.06)], INK);
-    inner += poly([P(0.03, y1, z1), P(0.03, y2, z1), P(0.03, y2, z2), P(0.03, y1, z2)], "#fbfaf7");
-    const blocks = [[14, 12, 22, 14], [40, 10, 16, 20], [62, 14, 26, 12], [96, 10, 18, 26], [120, 16, 14, 18], [16, 34, 14, 22], [44, 40, 30, 18], [80, 36, 12, 28], [104, 48, 22, 14], [24, 64, 26, 10], [64, 68, 18, 8], [100, 68, 28, 8]];
+    inner += poly([P(0.03, y1, z1), P(0.03, y2, z1), P(0.03, y2, z2), P(0.03, y1, z2)], "#ffffff");
     inner += `<g transform="${onFaceX(0.04, y2, z2)}">
-      ${blocks.map(([bx, by, bw, bh]) => `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="#c9c6c0"/>`).join("")}
-      <path d="M10 30 H${w - 10} M10 62 H${w - 10} M37 8 V${h - 22} M94 8 V${h - 22}" stroke="#2bb673" stroke-width="2.4" fill="none"/>
-      <path d="M10 30 C 32 42, 54 52, 94 62" stroke="#f2c230" stroke-width="2.4" fill="none"/>
-      <path d="M94 62 L134 48 M62 62 L62 84" stroke="#e5484d" stroke-width="2.4" fill="none"/>
-      <path class="route" d="M37 8 V30 H94 V62" stroke="#ffffff" stroke-width="1" fill="none" opacity=".9"/>
-      <circle cx="62" cy="84" r="3" fill="#e5484d"/><circle cx="134" cy="48" r="3" fill="#e5484d"/>
-      <rect x="12" y="${h - 16}" width="5" height="5" fill="#2bb673"/><rect x="19" y="${h - 16}" width="5" height="5" fill="#f2c230"/><rect x="26" y="${h - 16}" width="5" height="5" fill="#e5484d"/>
-      <text x="36" y="${h - 11}" class="map-text">PATHWAY INTEGRATION</text>
+      <image href="assets/img/inclusive-map-wall.jpg" x="${pad}" y="${pad}" width="${mapW}" height="${mapH}" preserveAspectRatio="none"/>
+      <defs><linearGradient id="integ" x1="0" x2="1"><stop offset="0" stop-color="#2bb673"/><stop offset=".5" stop-color="#f2d231"/><stop offset="1" stop-color="#e5484d"/></linearGradient></defs>
+      <text x="${pad}" y="${pad + mapH + 7}" class="map-text">PATHWAY INTEGRATION</text>
+      <rect x="${pad}" y="${pad + mapH + 10}" width="34" height="3" fill="url(#integ)"/>
+      <text x="${pad}" y="${pad + mapH + 18}" class="map-legend">strong</text><text x="${pad + 34}" y="${pad + mapH + 18}" class="map-legend" text-anchor="end">poor</text>
+      <rect x="${pad + 44}" y="${pad + mapH + 10}" width="10" height="3" fill="#2f5bd3"/><text x="${pad + 44}" y="${pad + mapH + 18}" class="map-legend">detour</text>
+      <path d="M${pad + 72} ${pad + mapH + 14} l3 -5 M${pad + 75} ${pad + mapH + 14} l3 -5" stroke="#222" stroke-width="1"/><text x="${pad + 70}" y="${pad + mapH + 18}" class="map-legend">stairs</text>
     </g>`;
     s += obj("map", inner, P(0, (y1 + y2) / 2, z2 + 0.4));
   }

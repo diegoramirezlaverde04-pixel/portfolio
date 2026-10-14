@@ -191,7 +191,8 @@ h2.spaced { text-transform: uppercase; letter-spacing: .28em; font-size: clamp(1
 .plaque-text { font: 700 2.3px var(--mono); letter-spacing: .12em; fill: #fff; }
 .sign-text { font: 700 9px var(--mono); letter-spacing: .14em; fill: #fff; }
 .window-reflect { fill: rgba(255, 255, 255, 0.08); }
-.map-text { font: 700 7px var(--mono); letter-spacing: .12em; fill: #555; }
+.map-legend { font: 500 3.6px var(--mono); fill: #555; }
+.map-text { font: 700 5.2px var(--mono); letter-spacing: .12em; fill: #444; }
 .steam { stroke: rgba(255, 255, 255, .45); stroke-width: 2; fill: none; stroke-linecap: round; animation: steam 3s ease-in-out infinite; }
 @keyframes steam { 0%, 100% { opacity: 0; transform: translateY(4px); } 50% { opacity: 1; transform: none; } }
 .route { stroke-dasharray: 6 4; animation: route 1.6s linear infinite; }
