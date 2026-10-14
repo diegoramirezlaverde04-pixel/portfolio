@@ -299,7 +299,7 @@
       cells.forEach(([gx, gy, m]) => inner += box(ox + gx * cw, oy + gy * cw, Zb, cw, cw, 0.04 + (m / 255) * 0.42, "#d3cec6"));
     }
     // plaque on the table's front edge
-    inner += `<g transform="${onFaceY(tx + 0.5, ty + td + 0.002, tz + 0.09)}"><rect width="${1.5 * S}" height="${0.08 * S}" fill="${INK}"/><text x="${0.75 * S}" y="${0.08 * S - 0.6}" text-anchor="middle" class="plaque-text">UC CAMPUS · FIGURE-GROUND</text></g>`;
+    inner += `<g transform="${onFaceY(tx + 0.4, ty + td + 0.002, tz + 0.09)}"><rect width="${3.0 * S}" height="${0.08 * S}" fill="${INK}"/><text x="${1.5 * S}" y="${0.08 * S - 0.6}" text-anchor="middle" class="plaque-text">University of Cincinnati’s Campus – Figure Ground</text></g>`;
     s += obj("model", inner, P(tx + tw / 2, ty + td / 2, Z0 + 2.4));
   }
 
