@@ -107,7 +107,7 @@ window.PORTFOLIO = {
       tags: ["accessibility", "gis", "design"],
       stack: ["ArcGIS", "Illustrator", "SketchUp", "Hand sketching"],
       color: "#2bb673",
-      cover: "assets/img/inclusive-map.jpg",
+      cover: "assets/img/inclusive-map-clean.jpg",
       gallery: [
         { src: "assets/img/inclusive-map.jpg", caption: "Pathway integration map: green = strong, yellow = moderate, red = poor integration", group: "Integration map" },
         { src: "assets/img/inclusive-sketch-linder.jpg", caption: "Sketch: ramp to Lindner Hall (well integrated)", group: "Sketches" },

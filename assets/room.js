@@ -130,7 +130,7 @@
   // ── Framed pathway-integration map on the left wall (slot: map)
   // The actual map from the Inclusive vs. Compliant project, with its legend.
   {
-    const pad = 6, mapW = 116, mapH = Math.round(mapW * 566 / 560), legH = 20;
+    const pad = 6, mapW = 116, mapH = Math.round(mapW * 573 / 560), legH = 20;
     const w = mapW + pad * 2, h = mapH + pad * 2 + legH;
     const y1 = 1.5, y2 = y1 + w / S, z2 = 6.45, z1 = z2 - h / S;
     let inner = poly([P(0.02, y1 - 0.06, z1 - 0.06), P(0.02, y2 + 0.06, z1 - 0.06), P(0.02, y2 + 0.06, z2 + 0.06), P(0.02, y1 - 0.06, z2 + 0.06)], INK);
