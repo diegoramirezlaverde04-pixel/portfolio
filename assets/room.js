@@ -281,11 +281,11 @@
   // Footprints + streets from the AutoCAD figure-ground map (assets/campus3d.js
   // and the same map printed on the base), the same data as the 3D viewer.
   {
-    const tx = 5.95, ty = 0.25, tw = 3.6, td = 3.2, tz = DZ; // beside the desk, same height
+    const tx = 5.75, ty = 0.2, tw = 3.6, td = 2.7, tz = DZ; // beside the desk: same height, depth and front edge
     let inner = box(tx + 0.15, ty + 0.15, 0, 0.07, 0.07, tz, INK) + box(tx + tw - 0.22, ty + 0.15, 0, 0.07, 0.07, tz, INK);
     inner += box(tx + 0.15, ty + td - 0.22, 0, 0.07, 0.07, tz, INK) + box(tx + tw - 0.22, ty + td - 0.22, 0, 0.07, 0.07, tz, INK);
-    inner += box(tx, ty, tz, tw, td, 0.1, WHITE);
-    const Z0 = tz + 0.1;
+    inner += box(tx, ty, tz, tw, td, DT, WHITE);
+    const Z0 = tz + DT;
     const C3 = window.CAMPUS3D;
     if (C3) {
       const hts = Uint8Array.from(atob(C3.heights), (c) => c.charCodeAt(0));
