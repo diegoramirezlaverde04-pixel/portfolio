@@ -147,12 +147,29 @@
     s += obj("map", inner, P(0, (y1 + y2) / 2, z2 + 0.4));
   }
 
-  // ── Street-name sign on the left wall (decor) ─────────────
+  // ── UC wall decor on the left wall: red felt pennant + bridge print ──
   {
-    const y1 = 6.5, y2 = 8.9, z1 = 5.55, z2 = 6.15, w = (y2 - y1) * S, h = (z2 - z1) * S;
-    s += poly([P(0.03, y1, z1), P(0.03, y2, z1), P(0.03, y2, z2), P(0.03, y1, z2)], "#1f7a4d");
-    s += `<g transform="${onFaceX(0.04, y2, z2)}"><rect x="2" y="2" width="${w - 4}" height="${h - 4}" fill="none" stroke="#fff" stroke-width="1.2" rx="2"/>
-      <text x="${w / 2}" y="${h / 2 + 4}" text-anchor="middle" class="sign-text">HOPKINS ST</text></g>`;
+    const UC_RED = "#e00122";
+    // pennant: base on the left, point to the right
+    const pw = 80, ph = 40, py2 = 9.0, pz2 = 6.4;
+    s += `<g transform="${onFaceX(0.04, py2, pz2)}">
+      <path d="M0 2 L${pw} ${ph / 2 + 1} L0 ${ph + 2} Z" fill="#000" opacity=".12"/>
+      <path d="M0 0 L${pw} ${ph / 2} L0 ${ph} Z" fill="${UC_RED}"/>
+      <rect x="0" y="0" width="7" height="${ph}" fill="#111"/>
+      <circle cx="3.5" cy="5" r="1.2" fill="#d9d6cf"/><circle cx="3.5" cy="${ph - 5}" r="1.2" fill="#d9d6cf"/>
+      <text x="11" y="${ph / 2 + 2.2}" class="pennant-text">CINCINNATI</text>
+    </g>`;
+    // framed print of the Roebling Suspension Bridge
+    const fw = 1.05 * S, fh = 0.62 * S, fy2 = 9.25, fz2 = 5.0;
+    s += `<g transform="${onFaceX(0.04, fy2, fz2)}">
+      <rect x="-1.2" y="-1.2" width="${fw + 2.4}" height="${fh + 2.4}" fill="#111"/>
+      <rect width="${fw}" height="${fh}" fill="#fbfaf7"/>
+      <rect x="3" y="3" width="${fw - 6}" height="${fh - 6}" fill="#fff" stroke="#e5e2dc" stroke-width=".4"/>
+      <path d="M4 ${fh - 7} H${fw - 4}" stroke="${UC_RED}" stroke-width="1.2"/>
+      <path d="M${fw * 0.3} ${fh - 7} V6 M${fw * 0.7} ${fh - 7} V6" stroke="${UC_RED}" stroke-width="1.6"/>
+      <path d="M4 ${fh - 9} Q${fw * 0.15} ${fh - 10} ${fw * 0.3} 6.5 Q${fw * 0.5} ${fh - 8} ${fw * 0.7} 6.5 Q${fw * 0.85} ${fh - 10} ${fw - 4} ${fh - 9}" stroke="${UC_RED}" stroke-width=".7" fill="none"/>
+      <path d="M4 ${fh - 4.5} H${fw - 4}" stroke="#9fb7c9" stroke-width="1"/>
+    </g>`;
   }
 
   // ── Floating oak shelf with the tiny-house model (slot: house)
