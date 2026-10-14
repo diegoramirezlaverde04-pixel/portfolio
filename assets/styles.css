@@ -168,16 +168,17 @@ h2.spaced { text-transform: uppercase; letter-spacing: .28em; font-size: clamp(1
 }
 .room-chip:hover, .room-chip.active { color: var(--text); background: color-mix(in srgb, var(--c) 18%, transparent); border-color: var(--c); box-shadow: 0 0 18px color-mix(in srgb, var(--c) 30%, transparent); }
 .room-label {
-  position: absolute; z-index: 5; pointer-events: none; white-space: nowrap; max-width: min(92vw, 520px);
-  overflow: hidden; text-overflow: ellipsis;
+  position: absolute; z-index: 5; pointer-events: none; width: max-content; max-width: min(92vw, 560px);
+  text-align: left; line-height: 1.45;
   transform: translate(-50%, -130%) scale(.96); opacity: 0; transition: opacity .18s, transform .18s;
-  font-size: .72rem; letter-spacing: .08em; padding: 8px 14px; border-radius: 999px;
+  font-size: .72rem; letter-spacing: .08em; padding: 8px 16px; border-radius: 16px;
   color: #f5efe6; background: rgba(24, 27, 25, 0.9); border: 1px solid var(--c);
   box-shadow: 0 0 22px color-mix(in srgb, var(--c) 35%, transparent);
 }
 .room-label.on { opacity: 1; transform: translate(-50%, -130%) scale(1); }
 .room-label .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; background: var(--c); box-shadow: 0 0 8px var(--c); }
-.room-label .sep { opacity: .5; }
+.room-label b { display: block; font-weight: 600; white-space: nowrap; }
+.room-label .desc { display: block; margin-top: 2px; padding-left: 15px; letter-spacing: .02em; opacity: .8; font-family: var(--sans); font-size: .8rem; }
 
 /* SVG room pieces */
 .plank { stroke: var(--plank); stroke-width: 1; }

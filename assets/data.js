@@ -62,6 +62,7 @@ window.PORTFOLIO = {
   //              | "house" (shelf) | "blink" (light sculpture)
   //              (also available: "board" | "blueprints" | "tree")
   //   viewer3d → true shows the interactive 3D figure-ground model in the project view
+  //   hover    → optional text for the room's hover label (defaults to the summary)
   //   cover   → image shown on the card and at the top of the project view
   //   gallery → [{ src, caption, group }]; click an image to enlarge it
   projects: [
@@ -71,6 +72,7 @@ window.PORTFOLIO = {
       title: "Campus Analysis Mapping",
       room: "model",
       viewer3d: true,
+      hover: "University of Cincinnati’s Campus – Figure Ground",
       context: "UC DAAP coursework",
       status: "live",
       summary: "Figure-ground maps of UC's building footprints and pathways, by hand and in AutoCAD and ArcGIS.",

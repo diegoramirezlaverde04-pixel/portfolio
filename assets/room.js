@@ -381,7 +381,7 @@
     [pt.x, pt.y] = anchors[id];
     const sp = pt.matrixTransform(svg.getScreenCTM());
     const wr = wrap.getBoundingClientRect();
-    label.innerHTML = `<span class="dot"></span>${esc(p.title.toUpperCase())} <span class="sep">—</span> ${esc(p.summary)}`;
+    label.innerHTML = `<b><span class="dot"></span>${esc(p.title.toUpperCase())}</b><span class="desc">${esc(p.hover || p.summary)}</span>`;
     label.style.setProperty("--c", p.color || "#ff7d41");
     label.style.left = `${sp.x - wr.left}px`;
     label.style.top = `${sp.y - wr.top}px`;
