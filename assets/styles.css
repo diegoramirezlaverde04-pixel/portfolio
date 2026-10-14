@@ -189,6 +189,7 @@ h2.spaced { text-transform: uppercase; letter-spacing: .28em; font-size: clamp(1
 .win-light { fill: #ffd98a; animation: twinkle 4s ease-in-out infinite; }
 @keyframes twinkle { 50% { opacity: .25; } }
 .plaque-text { font: 700 2.3px var(--mono); letter-spacing: .12em; fill: #fff; }
+.board-title { font: 700 4.4px var(--display); letter-spacing: .1em; fill: #fff; }
 .pennant-text { font: 700 6.2px var(--display); letter-spacing: .08em; fill: #fff; }
 .window-reflect { fill: rgba(255, 255, 255, 0.08); }
 .map-legend { font: 500 3.6px var(--mono); fill: #555; }

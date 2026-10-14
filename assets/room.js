@@ -191,16 +191,23 @@
     s += obj("house", inner, P(0.4, 7.4, 5.15));
   }
 
-  // ── Minimal felt pinboard on the right wall (slot: board) ──
+  // ── Pinboard with the Union Park site plan pinned up (slot: board) ──
   {
     const x1 = 0.9, x2 = 4.6, z1 = 4.0, z2 = 6.3, w = (x2 - x1) * S, h = (z2 - z1) * S;
     let inner = box(x1, 0, z1, x2 - x1, 0.06, z2 - z1, INK);
+    const pw = 62, ph = Math.round(pw * 804 / 832);
     inner += `<g transform="${onFaceY(x1 + 0.05, 0.065, z2 - 0.05)}">
       <rect width="${w - 3}" height="${h - 3}" fill="#e2e0db"/>
-      ${[[10, 10, "#fbfaf7"], [44, 10, "#d6efe3"], [78, 10, "#fbfaf7"], [10, 42, "#fdf1c9"], [44, 42, "#fbfaf7"], [78, 42, "#d6efe3"]]
-        .map(([nx, ny, nc]) => `<rect x="${nx}" y="${ny}" width="26" height="24" fill="${nc}"/>
-          <rect x="${nx + 4}" y="${ny + 7}" width="16" height="2" fill="#0002"/><rect x="${nx + 4}" y="${ny + 12}" width="11" height="2" fill="#0002"/>`).join("")}
-      ${[[23, 10], [57, 10], [91, 10], [23, 42], [57, 42], [91, 42]].map(([px, py]) => `<circle cx="${px}" cy="${py}" r="1.8" fill="${INK}"/>`).join("")}
+      <g transform="rotate(-2 ${8 + pw / 2} ${6 + ph / 2})">
+        <rect x="7" y="6.5" width="${pw + 2}" height="${ph + 2}" fill="#0002"/>
+        <rect x="6" y="5.5" width="${pw + 2}" height="${ph + 2}" fill="#fff"/>
+        <image href="assets/img/union-park-site-plan.jpg" x="7" y="6.5" width="${pw}" height="${ph}" preserveAspectRatio="none"/>
+      </g>
+      <rect x="${pw + 16}" y="8" width="34" height="13" fill="#3f78b5"/>
+      <text x="${pw + 33}" y="16.4" text-anchor="middle" class="board-title">UNION PARK</text>
+      ${[[pw + 16, 26, "#fbfaf7"], [pw + 34, 26, "#d6efe3"]].map(([nx, ny, nc]) => `<rect x="${nx}" y="${ny}" width="16" height="15" fill="${nc}"/>
+        <rect x="${nx + 3}" y="${ny + 5}" width="10" height="1.4" fill="#0002"/><rect x="${nx + 3}" y="${ny + 8.5}" width="7" height="1.4" fill="#0002"/>`).join("")}
+      ${[[8 + pw / 2, 6], [pw + 33, 8], [pw + 24, 26], [pw + 42, 26]].map(([px, py]) => `<circle cx="${px}" cy="${py}" r="1.8" fill="#e00122"/>`).join("")}
     </g>`;
     s += obj("board", inner, P((x1 + x2) / 2, 0.1, z2 + 0.4));
   }
