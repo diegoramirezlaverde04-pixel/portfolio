@@ -74,7 +74,6 @@ window.PORTFOLIO = {
       room: "model",
       viewer3d: true,
       hover: "University of Cincinnati’s Campus – Figure Ground",
-      context: "UC DAAP coursework",
       status: "live",
       summary: "Figure-ground maps of UC's building footprints and pathways, by hand and in AutoCAD and ArcGIS.",
       description: [
@@ -98,7 +97,6 @@ window.PORTFOLIO = {
       num: "02",
       title: "Inclusive vs. Compliant Pathways",
       room: "map",
-      context: "UC DAAP coursework",
       status: "live",
       summary: "Where UC's wheelchair-accessible routes split from the paths most students actually use.",
       description: [
@@ -125,7 +123,6 @@ window.PORTFOLIO = {
       num: "03",
       title: "Hopkins St & Dalton Ave Redevelopment",
       room: "monitor",
-      context: "UC DAAP coursework",
       status: "live",
       summary: "Reimagining the car-centric intersection at Union Terminal's entrance as a walkable place.",
       description: [
@@ -154,7 +151,6 @@ window.PORTFOLIO = {
       num: "04",
       title: "Union Park",
       room: "board",
-      context: "UC DAAP coursework",
       status: "live",
       summary: "Queensgate’s first public park, capping I-75 beside Union Terminal to improve the pedestrian environment.",
       description: [

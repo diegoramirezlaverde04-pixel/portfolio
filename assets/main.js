@@ -154,7 +154,7 @@
         <span class="modal-num">${esc(p.num || "")}</span></div>
       <div class="modal-body">
         <h3>${esc(p.title)}</h3>
-        <div class="meta">${esc(p.context || p.year || "")} · ${p.tags.map(esc).join(", ")}</div>
+        <div class="meta">${[p.context || p.year, p.tags.join(", ")].filter(Boolean).map(esc).join(" · ")}</div>
         ${p.viewer3d && window.mountCampus3D ? `<div class="viewer3d" id="viewer3d"></div>` : ""}
         <div class="modal-text">${paras(p.description)}</div>
         <ul class="stack" style="--c:${c}">${p.stack.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>
