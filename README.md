@@ -4,11 +4,11 @@ An interactive portfolio built around a **modern isometric planning studio**. Ea
 
 | Object in the room | Project |
 | --- | --- |
-| UC campus model on the center table | 01 Campus Analysis Mapping (opens an interactive 3D figure-ground model) |
+| UC campus model on the table beside the desk | 01 Campus Analysis Mapping (opens an interactive 3D figure-ground model) |
 | Pathway integration map on the wall | 02 Inclusive vs. Compliant Pathways |
 | Monitor with a street render | 03 Hopkins St & Dalton Ave Redevelopment |
 | Tiny house model on the shelf | 04 ADA Tiny House · Magdalena Homes |
-| Glowing cardboard leaf by the window | 05 BLINK Festival: "Future City" |
+| Glowing leaf sculpture on the rug | 05 BLINK Festival: "Future City" |
 
 Also: project cards with galleries and a lightbox, About with education and experience, a working terminal (`help`, `open 1`, `lamp`), a `Ctrl/⌘ + K` command palette, and light/dark themes. Respects `prefers-reduced-motion`.
 

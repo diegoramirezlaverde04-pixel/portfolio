@@ -189,7 +189,7 @@
   }
 
   // ── Rug ───────────────────────────────────────────────────
-  s += flat(3.4, 3.4, 0.005, 6.0, 5.6, "var(--rug)");
+  s += flat(3.0, 4.4, 0.005, 5.6, 4.6, "var(--rug)");
 
   // ── Desk: white top on slim black legs ────────────────────
   const DZ = 2.55, DT = 0.12, TOP = DZ + DT;
@@ -267,9 +267,9 @@
   {
     const col = colorOf("blueprints", "#9cc7ef");
     let inner = "";
-    [[6.35, 0.85, 2.0], [6.65, 0.75, 2.35], [6.55, 1.15, 1.7], [6.85, 1.05, 2.1]].forEach(([cx, cy, hh]) => (inner += cyl(cx, cy, 0.4, 0.12, hh, col)));
-    inner += cyl(6.6, 0.95, 0, 0.5, 1.15, INK);
-    s += obj("blueprints", inner, P(6.6, 0.95, 3.3));
+    [[0.6, 5.55, 1.5], [0.9, 5.45, 1.8], [0.8, 5.85, 1.3], [1.1, 5.75, 1.6]].forEach(([cx, cy, hh]) => (inner += cyl(cx, cy, 0.4, 0.12, hh, col)));
+    inner += cyl(0.85, 5.65, 0, 0.5, 1.15, INK);
+    s += obj("blueprints", inner, P(0.85, 5.65, 2.75));
   }
 
   // ── Shell chair (decor) ───────────────────────────────────
@@ -281,7 +281,7 @@
   // Footprints + streets from the AutoCAD figure-ground map (assets/campus3d.js
   // and the same map printed on the base), the same data as the 3D viewer.
   {
-    const tx = 4.1, ty = 4.1, tw = 4.8, td = 3.8, tz = 1.65;
+    const tx = 5.95, ty = 0.25, tw = 3.6, td = 3.2, tz = DZ; // beside the desk, same height
     let inner = box(tx + 0.15, ty + 0.15, 0, 0.07, 0.07, tz, INK) + box(tx + tw - 0.22, ty + 0.15, 0, 0.07, 0.07, tz, INK);
     inner += box(tx + 0.15, ty + td - 0.22, 0, 0.07, 0.07, tz, INK) + box(tx + tw - 0.22, ty + td - 0.22, 0, 0.07, 0.07, tz, INK);
     inner += box(tx, ty, tz, tw, td, 0.1, WHITE);
@@ -323,19 +323,11 @@
     s += obj("tree", inner, [bx, by - 92]);
   }
 
-  // ── Arc floor lamp (decor) ────────────────────────────────
-  {
-    const [fx, fy] = P(2.3, 9.0, 0.06), [ax, ay] = P(3.4, 7.0, 4.6);
-    s += cyl(2.3, 9.0, 0, 0.32, 0.06, INK);
-    s += `<path d="M${fx} ${fy} C ${fx - 6} ${fy - 150}, ${ax - 30} ${ay - 40}, ${ax} ${ay}" stroke="${INK}" stroke-width="2.2" fill="none"/>
-      <path d="M${ax - 12} ${ay + 10} A12 10 0 0 1 ${ax + 12} ${ay + 10} Z" fill="${INK}"/>`;
-  }
-
   // ── BLINK "Future City" leaf sculpture on a stand (slot: blink) ──
   // A mosaic of translucent red/orange/yellow/green panels with string lights,
   // after the real piece.
   {
-    const cx = 9.05, cy = 2.75;
+    const cx = 8.7, cy = 6.7;
     const [fx, fy] = P(cx, cy, 0);
     const sx = fx, sy = fy - 60, L = 122, HW = 40;   // stem point, leaf length, half width
     const half = (v) => HW * Math.pow(Math.sin(Math.PI * Math.pow(v, 0.8)), 0.9); // widest below the middle, pointed tip // width along the leaf
