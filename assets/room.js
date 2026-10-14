@@ -216,16 +216,24 @@
     let inner = box(3.15, 0.35, TOP, 1.1, 0.55, 0.03, "#3a3a3a") + box(3.6, 0.42, TOP, 0.2, 0.12, 0.6, "#3a3a3a");
     inner += box(x, y, z, w, d, h, "#1d1d1d");
     const sw = (w - 0.1) * S, sh = (h - 0.1) * S;
+    // SketchUp-style window showing the actual Hopkins & Dalton render
+    const tb = 5, tool = 4, pal = 6, st = 3.4;               // title bar, toolbar, tool palette, status bar
+    const vx = pal + 0.6, vy = tb + tool + 0.6, vw = sw - vx - 0.6, vh = sh - vy - st - 0.6;
+    const icons = ["#e5484d", "#f2a33a", "#f2d231", "#2bb673", "#5b8def", "#8a63d2", "#9aa3ad", "#5c6470", "#2bb673", "#e5484d", "#9aa3ad", "#5b8def"];
     inner += `<g transform="${onFaceY(x + 0.05, y + d + 0.005, z + h - 0.05)}">
-      <rect width="${sw}" height="${sh}" fill="#e6f1fa"/>
-      <rect x="0" y="0" width="${sw}" height="6" fill="#f4f4f4"/><circle cx="4" cy="3" r="1.3" fill="#e5484d"/><circle cx="8" cy="3" r="1.3" fill="#f2c230"/><circle cx="12" cy="3" r="1.3" fill="#2bb673"/>
-      <path d="M${sw * 0.18} ${sh * 0.72} V${sh * 0.42} A${sw * 0.32} ${sh * 0.36} 0 0 1 ${sw * 0.82} ${sh * 0.42} V${sh * 0.72} Z" fill="#e8dcc6"/>
-      ${[0.36, 0.45, 0.55, 0.64].map((f) => `<rect x="${sw * f - 2}" y="${sh * 0.36}" width="4" height="${sh * 0.3}" fill="#9fb7c9"/>`).join("")}
-      <rect x="0" y="${sh * 0.72}" width="${sw}" height="${sh * 0.28}" fill="#8b8f99"/>
-      <rect x="0" y="${sh * 0.72}" width="${sw}" height="3" fill="#6fbf4a"/>
-      ${[0.3, 0.42, 0.54, 0.66].map((f) => `<rect x="${sw * f}" y="${sh * 0.85}" width="7" height="3" fill="#f2d231"/>`).join("")}
-      <rect x="${sw * 0.12}" y="${sh * 0.6}" width="2" height="9" fill="#333"/><circle cx="${sw * 0.12 + 1}" cy="${sh * 0.59}" r="2" fill="#333"/>
-      <rect x="${sw * 0.86}" y="${sh * 0.62}" width="2" height="8" fill="#333"/><circle cx="${sw * 0.86 + 1}" cy="${sh * 0.61}" r="2" fill="#333"/>
+      <defs><clipPath id="vp"><rect x="${vx}" y="${vy}" width="${vw}" height="${vh}"/></clipPath></defs>
+      <rect width="${sw}" height="${sh}" fill="#ecebe8"/>
+      <rect width="${sw}" height="${tb}" fill="#dcdad6"/>
+      <circle cx="3" cy="2.5" r="1.1" fill="#e5484d"/><circle cx="6.2" cy="2.5" r="1.1" fill="#f2c230"/><circle cx="9.4" cy="2.5" r="1.1" fill="#2bb673"/>
+      <text x="13" y="3.3" font-size="2.4" font-family="Inter, system-ui, sans-serif" fill="#4a4744">Hopkins_Dalton_Redevelopment.skp</text>
+      ${icons.map((c, i) => `<rect x="${1.2 + i * 4.2}" y="${tb + 0.8}" width="3" height="2.4" rx=".5" fill="${c}" opacity=".85"/>`).join("")}
+      <rect x="0" y="${tb + tool}" width="${pal}" height="${sh - tb - tool - st}" fill="#e2e0dc"/>
+      ${Array.from({ length: 9 }, (_, i) => `<rect x="1" y="${tb + tool + 1.2 + i * 4.3}" width="4" height="3.2" rx=".6" fill="${i === 2 ? "#5b8def" : "#b9b6b0"}"/>`).join("")}
+      <image href="assets/img/hopkins-after-intersection.jpg" x="${vx}" y="${vy}" width="${vw}" height="${vh}" preserveAspectRatio="xMidYMid slice" clip-path="url(#vp)"/>
+      <path d="M${vx + vw * 0.62} ${vy + vh * 0.42} l0 5.5 l1.4 -1.3 l1.1 2.3 l.9 -.4 l-1.1 -2.3 l1.9 0 Z" fill="#fff" stroke="#222" stroke-width=".35"/>
+      <rect x="0" y="${sh - st}" width="${sw}" height="${st}" fill="#dcdad6"/>
+      <rect x="1.5" y="${sh - st + 1.2}" width="22" height="1" fill="#9a978f"/>
+      <rect x="${sw - 22}" y="${sh - st + 0.6}" width="20" height="2.2" fill="#fbfaf7" stroke="#b9b6b0" stroke-width=".3"/>
     </g>`;
     s += obj("monitor", inner, P(x + w / 2, y + d / 2, z + h + 0.7));
   }
